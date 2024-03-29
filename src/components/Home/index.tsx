@@ -1,6 +1,6 @@
 import Nav from "../../Nav";
 import { Link } from "react-router-dom";
-import ListOfGames from "./listofgames";
+import GameList from "./GameList";
 
 function Home() {
   return (
@@ -10,7 +10,7 @@ function Home() {
       <Link to="/Game">
         <button>Create New Game</button>
       </Link>
-      <ListOfGames />
+      <GameList />
     </div>
   );
 }
