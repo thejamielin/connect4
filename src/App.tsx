@@ -6,6 +6,7 @@ import Profile from "./components/Profile";
 import Login from "./components/Login";
 import Search from "./components/Search";
 import Details from "./components/Details";
+import Game from "./components/Game";
 import { HashRouter } from "react-router-dom";
 import { Routes, Route, Navigate } from "react-router";
 
@@ -20,6 +21,7 @@ function App() {
           <Route path="/Login" element={<Login />} />
           <Route path="/Search" element={<Search />} />
           <Route path="/Details" element={<Details />} />
+          <Route path="/Game" element={<Game />} />
         </Routes>
       </div>
     </HashRouter>
