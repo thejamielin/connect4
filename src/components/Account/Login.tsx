@@ -3,11 +3,25 @@ import Nav from "../../Nav";
 import { useNavigate } from "react-router";
 import axios from "axios";
 import { apiAccountLogin, cacheSessionToken } from "../../dao";
+import Inputs from "./Inputs";
 
 function Login() {
   const navigate = useNavigate();
   const [username, setUsername] = useState<string>('');
   const [password, setPassword] = useState<string>('');
+  const FIELDS = [
+    {
+      name: 'username',
+      set: setUsername,
+      value: username,
+    },
+    {
+      name: 'password',
+      set: setPassword,
+      value: password,
+      hide: true
+    }
+  ]
   function login() {
     if (!username || !password) {
       return;
@@ -25,9 +39,9 @@ function Login() {
       <Nav />
       <h1>Login</h1>
       <div style={{display: 'flex', flexDirection: 'column'}}>
-        <label>Username <input value={username} onChange={e => setUsername(e.target.value)}/></label>
-        <label>Password <input value={password} type="password" onChange={e => setPassword(e.target.value)}/></label>
+        <Inputs fields={FIELDS}/>
         <button onClick={login}>Log in</button>
+        <button onClick={() => navigate('/register')}>Go Register</button>
       </div>
     </div>
   );
