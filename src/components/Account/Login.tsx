@@ -1,14 +1,37 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Nav from "../../Nav";
 import { useNavigate } from "react-router";
 import axios from "axios";
-import { apiAccountLogin, cacheSessionToken } from "../../dao";
+import { apiAccountCheckSession, apiAccountLogin, cacheSessionToken, getSessionToken } from "../../dao";
 import Inputs from "./Inputs";
 
 function Login() {
   const navigate = useNavigate();
   const [username, setUsername] = useState<string>('');
   const [password, setPassword] = useState<string>('');
+  const [loggedIn, setLoggedIn] = useState<boolean>();
+
+  useEffect(() => {
+    const token = getSessionToken();
+    if (!token) {
+      setLoggedIn(false);
+      return;
+    }
+    apiAccountCheckSession(token).then(isValidSession => {
+      setLoggedIn(isValidSession);
+    });
+  }, []);
+
+  useEffect(() => {
+    if (loggedIn === true) {
+      navigate('/home');
+    }
+  }, [loggedIn]);
+
+  if (loggedIn === undefined) {
+    return <div>Loading</div>
+  }
+
   const FIELDS = [
     {
       name: 'username',

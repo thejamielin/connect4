@@ -20,8 +20,8 @@ function Inputs({fields} : {fields : InputField[]}) {
     <div>
       <div style={{display: 'flex', flexDirection: 'column'}}>
         {
-          fields.map((field : InputField) => (
-            <label>{field.name} <input type={field.hide ? "password" : undefined}
+          fields.map((field : InputField, i) => (
+            <label key={i}>{field.name} <input type={field.hide ? "password" : undefined}
                                        value={field.value}
                                        onChange={e => field.set(e.target.value)}/></label>
           ))
