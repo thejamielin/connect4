@@ -1,7 +1,13 @@
 import { Dropdown } from "react-bootstrap";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { apiAccountLogout } from "./dao";
 
 function AccountButton() {
+  const navigate = useNavigate();
+  async function logout() {
+    await apiAccountLogout().then(() => navigate('/login'));
+  }
+
   return (
     <Dropdown>
       <Dropdown.Toggle variant="success" id="dropdown-basic">
@@ -9,7 +15,7 @@ function AccountButton() {
       </Dropdown.Toggle>
 
       <Dropdown.Menu>
-        <Dropdown.Item href="#/action-1">Action</Dropdown.Item>
+        <Dropdown.Item onClick={logout}>Logout</Dropdown.Item>
         <Dropdown.Item href="#/action-2">Another action</Dropdown.Item>
         <Dropdown.Item href="#/action-3">Something else</Dropdown.Item>
       </Dropdown.Menu>

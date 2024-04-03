@@ -6,6 +6,10 @@ export function cacheSessionToken(token: string) {
   localStorage.setItem(COOKIE_TOKEN_NAME, token);
 }
 
+export function deleteSessionToken() {
+  localStorage.removeItem(COOKIE_TOKEN_NAME);
+}
+
 export function getSessionToken(): string | undefined {
   return localStorage.getItem(COOKIE_TOKEN_NAME) || undefined;
 }
@@ -15,6 +19,7 @@ const GAMES_SEARCH = `${API_BASE}/games/search`;
 const ACCOUNT_LOGIN = `${API_BASE}/account/login`;
 const ACCOUNT_REGISTER = `${API_BASE}/account/register`;
 const ACCOUNT_CHECKSESSION = `${API_BASE}/account/checkSession`;
+const ACCOUNT_LOGOUT = `${API_BASE}/account/logout`;
 
 export interface GameSearchParameters {
   count: number;
@@ -42,4 +47,8 @@ export async function apiAccountRegister(username: string, password: string, ema
 export async function apiAccountCheckSession(token: string) {
   const response = await axios.post(ACCOUNT_CHECKSESSION, {token: token});
   return response.data.isValidSession;
+}
+
+export async function apiAccountLogout() {
+  await axios.post(ACCOUNT_LOGOUT, {token: getSessionToken()});
 }

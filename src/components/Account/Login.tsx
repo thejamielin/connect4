@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import Nav from "../../Nav";
 import { useNavigate } from "react-router";
 import axios from "axios";
-import { apiAccountCheckSession, apiAccountLogin, cacheSessionToken, getSessionToken } from "../../dao";
+import { apiAccountCheckSession, apiAccountLogin, cacheSessionToken, deleteSessionToken, getSessionToken } from "../../dao";
 import Inputs from "./Inputs";
 
 function Login() {
@@ -19,6 +19,7 @@ function Login() {
     }
     apiAccountCheckSession(token).then(isValidSession => {
       setLoggedIn(isValidSession);
+      isValidSession || deleteSessionToken();
     });
   }, []);
 
