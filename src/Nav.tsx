@@ -1,45 +1,44 @@
-import { Dropdown } from "react-bootstrap";
+import { Button, Dropdown, DropdownButton, NavItem, Navbar } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
 import { apiAccountLogout } from "./dao";
 
-function AccountButton() {
+function AccountButton({loggedIn}: {loggedIn: boolean}) {
   const navigate = useNavigate();
   async function logout() {
-    await apiAccountLogout().then(() => navigate('/login'));
+    await apiAccountLogout().then(() => navigate('/#/login'));
   }
 
   return (
-    <Dropdown>
-      <Dropdown.Toggle variant="success" id="dropdown-basic">
-        Dropdown Button
-      </Dropdown.Toggle>
-
-      <Dropdown.Menu>
-        <Dropdown.Item onClick={logout}>Logout</Dropdown.Item>
-        <Dropdown.Item href="#/action-2">Another action</Dropdown.Item>
-        <Dropdown.Item href="#/action-3">Something else</Dropdown.Item>
-      </Dropdown.Menu>
-    </Dropdown>
+    <div>
+      {
+        loggedIn ? (
+          <DropdownButton title='Account' align='end'>
+            <Dropdown.Item href="/profile">Profile</Dropdown.Item>
+            <Dropdown.Item onClick={logout}>Logout</Dropdown.Item>
+          </DropdownButton>
+        ) : <Button href='/login'>Log in</Button>
+      }
+    </div>
   )
 }
 
-function Nav() {
+function Nav({loggedIn}: {loggedIn?: boolean}) {
   return (
-    <nav className="nav nav-tabs mt-2 d-flex justify-content-between">
+    <Navbar className="nav nav-tabs mt-2">
       <Link className="nav-link" to="/Home">
         Home
       </Link>
-      <Link className="nav-link" to="/Login">
-        Login
-      </Link>
-      <Link className="nav-link" to="/Profile">
-        Profile
-      </Link>
-      <Link className="nav-link" to="/Search">
-        Search
-      </Link>
-      <AccountButton/>
-    </nav>
+      <Navbar.Collapse>
+        <NavItem className="d-flex justify-content-end" style={{width: '100%', paddingRight: '5%'}}>
+          <Link className="nav-link" to="/Search">
+            Search
+          </Link>
+          <Link className="nav-link" to="/friends">Friends</Link>
+          <AccountButton loggedIn={loggedIn || true}/>
+        </NavItem>
+      </Navbar.Collapse>
+
+    </Navbar>
   );
 }
 export default Nav;
