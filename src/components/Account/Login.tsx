@@ -8,6 +8,7 @@ import {
   cacheSessionToken,
   deleteSessionToken,
   getSessionToken,
+  validateLoggedIn,
 } from "../../dao";
 import Inputs from "./Inputs";
 
@@ -18,15 +19,7 @@ function Login() {
   const [loggedIn, setLoggedIn] = useState<boolean>();
 
   useEffect(() => {
-    const token = getSessionToken();
-    if (!token) {
-      setLoggedIn(false);
-      return;
-    }
-    apiAccountCheckSession(token).then((isValidSession) => {
-      setLoggedIn(isValidSession);
-      isValidSession || deleteSessionToken();
-    });
+    validateLoggedIn(setLoggedIn)
   }, []);
 
   useEffect(() => {
@@ -68,7 +61,7 @@ function Login() {
 
   return (
     <div>
-      <Nav />
+      <Nav loggedIn={loggedIn}/>
       <h1>Login</h1>
       <div style={{ display: "flex", flexDirection: "column" }}>
         <Inputs fields={FIELDS} />

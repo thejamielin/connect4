@@ -14,6 +14,18 @@ export function getSessionToken(): string | undefined {
   return localStorage.getItem(COOKIE_TOKEN_NAME) || undefined;
 }
 
+export function validateLoggedIn(setLoggedIn : (isLoggedIn: boolean) => void) {
+  const token = getSessionToken();
+    if (!token) {
+      setLoggedIn(false);
+      return;
+    }
+    apiAccountCheckSession(token).then((isValidSession) => {
+      setLoggedIn(isValidSession);
+      isValidSession || deleteSessionToken();
+    });
+}
+
 const API_BASE = process.env.REACT_APP_API_BASE;
 const GAMES_SEARCH = `${API_BASE}/games/search`;
 const ACCOUNT_LOGIN = `${API_BASE}/account/login`;

@@ -13,16 +13,16 @@ function AccountButton({loggedIn}: {loggedIn: boolean}) {
       {
         loggedIn ? (
           <DropdownButton title='Account' align='end'>
-            <Dropdown.Item href="/profile">Profile</Dropdown.Item>
+            <Dropdown.Item href="/#/profile">Profile</Dropdown.Item>
             <Dropdown.Item onClick={logout}>Logout</Dropdown.Item>
           </DropdownButton>
-        ) : <Button href='/login'>Log in</Button>
+        ) : <Button href='/#/login'>Log in</Button>
       }
     </div>
   )
 }
 
-function Nav({loggedIn}: {loggedIn?: boolean}) {
+function Nav({loggedIn}: {loggedIn: boolean}) {
   return (
     <Navbar className="nav nav-tabs mt-2">
       <Link className="nav-link" to="/Home">
@@ -34,7 +34,7 @@ function Nav({loggedIn}: {loggedIn?: boolean}) {
             Search
           </Link>
           <Link className="nav-link" to="/friends">Friends</Link>
-          <AccountButton loggedIn={loggedIn || true}/>
+          <AccountButton loggedIn={loggedIn}/>
         </NavItem>
       </Navbar.Collapse>
 

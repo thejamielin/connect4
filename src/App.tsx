@@ -10,7 +10,6 @@ import Game from "./components/Game";
 import { HashRouter } from "react-router-dom";
 import { Routes, Route, Navigate } from "react-router";
 import Register from "./components/Account/Register";
-import { getSessionToken } from "./dao";
 
 function App() {
   return (
