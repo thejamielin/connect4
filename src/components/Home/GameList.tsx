@@ -14,7 +14,8 @@ function GameList() {
   }, []);
 
   return (
-    <div>
+    <div style={{borderStyle: 'solid', padding: '10px', height: '100%'}}>
+      <h3>Game History</h3>
       {games.map((game, i) => (
         <GameListEntry game={game} key={i}/>
       ))}
@@ -25,10 +26,13 @@ function GameList() {
 export default GameList;
 
 function GameListEntry({ game }: { game: GameResult }) {
+  function winIcon(playerName: string) {
+    return <span style={{width: '20pt', display: 'inline-block'}}>{game.winner === playerName && <i className="bi bi-trophy"></i>}</span>;
+  }
   return (
-    <div style={{borderStyle: 'solid', justifyContent: 'center', display: 'flex'}}>
-      <div style={{fontSize: 20, backgroundColor: 'lightblue', width: '100%'}}>
-        {game.player1} <span style={{fontSize: 16}}>vs</span> {game.player2}
+    <div style={{borderStyle: 'solid', margin: '2%'}}>
+      <div style={{fontSize: 20, backgroundColor: 'lightblue', width: '100%', justifyContent: 'center', display: 'flex'}}>
+        <div>{winIcon(game.player1)} {game.player1} <span style={{fontSize: 16}}>vs</span> {game.player2} {winIcon(game.player2)}</div>
       </div>
     </div>
   );
