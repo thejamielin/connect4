@@ -26,12 +26,10 @@ export default GameList;
 
 function GameListEntry({ game }: { game: GameResult }) {
   return (
-    <div>
-      <div>{game.id}</div>
-      <div>{game.player1}</div>
-      <div>{game.player2}</div>
-      <div>{game.winner}</div>
-      <div>----------------------</div>
+    <div style={{borderStyle: 'solid', justifyContent: 'center', display: 'flex'}}>
+      <div style={{fontSize: 20, backgroundColor: 'lightblue', width: '100%'}}>
+        {game.player1} <span style={{fontSize: 16}}>vs</span> {game.player2}
+      </div>
     </div>
   );
 }
