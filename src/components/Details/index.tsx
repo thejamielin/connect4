@@ -45,7 +45,7 @@ function Details() {
     if (pfpSet) {
       return <Button disabled={true}>Profile Picture Already Set!</Button>;
     }
-    return <Button onChange={setProfilePicture}>Set as Profile Picture</Button>;
+    return <Button onClick={setProfilePicture}>Set as Profile Picture</Button>;
   }
 
   return (
