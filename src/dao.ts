@@ -34,7 +34,7 @@ const ACCOUNT_CHECKSESSION = `${API_BASE}/account/checkSession`;
 const ACCOUNT_LOGOUT = `${API_BASE}/account/logout`;
 const PICTURES_SEARCH = `${API_BASE}/pictures/search`;
 const PICTURES_ID = `${API_BASE}/pictures/id`;
-const USER_PFP = `${API_BASE}/user/pfp`;
+const USER = `${API_BASE}/user`;
 
 export interface GameSearchParameters {
   count: number;
@@ -89,7 +89,21 @@ export async function apiPictureId(imageID: string): Promise<PictureInfo[]> {
   return response.data;
 }
 
-export async function apiUserPfp(imageID: string): Promise<boolean> {
-  const response = await axios.put(USER_PFP, { body: { imageID: imageID }});
+export interface User {
+  email: string;
+  beginner: boolean;
+  username: string;
+  following: string[];
+  stats: UserStats;
+  password: string;
+  pfp?: string;
+}
+
+export interface UserStats {
+  // TODO: Add stat fields
+}
+
+export async function apiSetUser(user: Partial<Pick<User, 'email' | 'following' | 'pfp'>>): Promise<boolean> {
+  const response = await axios.put(USER, { body: { token: getSessionToken(), editedFields: user }});
   return response.data.success;
 }

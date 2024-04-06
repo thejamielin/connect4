@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import Nav from "../../Nav";
-import { PictureInfo, apiPictureId, apiUserPfp, validateLoggedIn } from "../../dao";
+import { PictureInfo, apiPictureId, apiSetUser, validateLoggedIn } from "../../dao";
 import { useParams } from "react-router";
 import { Button } from "react-bootstrap";
 
@@ -31,11 +31,11 @@ function Details() {
           <h1>This image does not exist.</h1>
         </div>
       </div>
-    )
+    );
   }
 
   const setProfilePicture = () => {
-    apiUserPfp(entryData.id + '').then(setPfpSet);
+    apiSetUser({ pfp: entryData.id + '' }).then(setPfpSet);
   }
 
   function SetPfpButton() {
