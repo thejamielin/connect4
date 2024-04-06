@@ -66,7 +66,18 @@ export async function apiAccountLogout() {
   await axios.post(ACCOUNT_LOGOUT, {token: getSessionToken()});
 }
 
-export async function apiPictureSearch(searchString: string) {
+export interface ApiEntry {
+  id: number;
+  previewURL: string;
+  webformatURL: string;
+  views: number;
+  downloads: number;
+  user: string;
+  tags: string;
+  likes: string[];
+}
+
+export async function apiPictureSearch(searchString: string): Promise<ApiEntry[]> {
   const response = await axios.get(PICTURES_SEARCH, { params: {q: searchString} });
   return response.data;
 }

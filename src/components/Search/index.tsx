@@ -1,36 +1,15 @@
 import { useEffect, useState } from "react";
 import Nav from "../../Nav";
-import { apiPictureSearch, validateLoggedIn } from "../../dao";
+import { ApiEntry, apiPictureSearch, validateLoggedIn } from "../../dao";
 import { Form } from "react-bootstrap";
 import { useNavigate } from "react-router";
-
-interface ApiEntry {
-  id: number;
-  previewURL: string;
-  webformatURL: string;
-  views: number;
-  downloads: number;
-  user: string;
-  tags: string;
-  likes: string[];
-}
-
-interface ApiResult {
-  total: number;
-  totalHits: number;
-  hits: ApiEntry[];
-}
 
 function Search() {
   const navigate = useNavigate();
   const [loggedIn, setLoggedIn] = useState<boolean>();
   const [searchString, setSearchString] = useState<string>('');
   const [hoveringOver, setHoveringOver] = useState<number>();
-  const [stuff, setStuff] = useState<ApiResult>({
-    total: 0,
-    totalHits: 0,
-    hits: []
-  });
+  const [imageEntries, setImageEntries] = useState<ApiEntry[]>([]);
 
   useEffect(() => {
     validateLoggedIn(setLoggedIn);
@@ -38,7 +17,7 @@ function Search() {
   }, []);
 
   function refreshSearchResults() {
-    apiPictureSearch(searchString).then(result => setStuff(result));
+    apiPictureSearch(searchString).then(result => setImageEntries(result));
   }
 
   if (loggedIn === undefined) {
@@ -58,7 +37,7 @@ function Search() {
           }}/>
         </div>
         <div style={{display: 'flex', alignItems: 'center', flexDirection: 'column'}}>
-          {stuff.hits.slice(10).map((imageEntry, i) => {
+          {imageEntries.slice(10).map((imageEntry, i) => {
             return (
               <div
                 className="unselectable"
