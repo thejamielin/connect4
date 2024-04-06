@@ -32,6 +32,7 @@ const ACCOUNT_LOGIN = `${API_BASE}/account/login`;
 const ACCOUNT_REGISTER = `${API_BASE}/account/register`;
 const ACCOUNT_CHECKSESSION = `${API_BASE}/account/checkSession`;
 const ACCOUNT_LOGOUT = `${API_BASE}/account/logout`;
+const PICTURES_SEARCH = `${API_BASE}/pictures/search`;
 
 export interface GameSearchParameters {
   count: number;
@@ -63,4 +64,9 @@ export async function apiAccountCheckSession(token: string) {
 
 export async function apiAccountLogout() {
   await axios.post(ACCOUNT_LOGOUT, {token: getSessionToken()});
+}
+
+export async function apiPictureSearch(searchString: string) {
+  const response = await axios.get(PICTURES_SEARCH, { params: {q: searchString} });
+  return response.data;
 }
