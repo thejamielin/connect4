@@ -5,7 +5,7 @@ import { apiAccountLogout } from "./dao";
 function AccountButton({loggedIn}: {loggedIn: boolean}) {
   const navigate = useNavigate();
   async function logout() {
-    await apiAccountLogout().then(() => navigate('/#/login'));
+    await apiAccountLogout().then(() => navigate('/login'));
   }
 
   return (
@@ -37,7 +37,6 @@ function Nav({loggedIn}: {loggedIn: boolean}) {
           <AccountButton loggedIn={loggedIn}/>
         </NavItem>
       </Navbar.Collapse>
-
     </Navbar>
   );
 }

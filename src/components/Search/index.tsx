@@ -53,7 +53,7 @@ function Search() {
                 key={i}
                 onMouseEnter={() => setHoveringOver(i)}
                 onMouseLeave={() => setHoveringOver(undefined)}
-                onClick={() => navigate(`/#/details/${imageEntry.id}`)}
+                onClick={() => navigate(`/details/${imageEntry.id}`)}
               >
                 <div style={{display: 'flex', alignItems: 'center', padding: '2%'}}>Image #{imageEntry.id}</div>
                 <img src={imageEntry.previewURL} style={{objectFit: 'fill', height: '100%'}}/>
