@@ -33,6 +33,8 @@ const ACCOUNT_REGISTER = `${API_BASE}/account/register`;
 const ACCOUNT_CHECKSESSION = `${API_BASE}/account/checkSession`;
 const ACCOUNT_LOGOUT = `${API_BASE}/account/logout`;
 const PICTURES_SEARCH = `${API_BASE}/pictures/search`;
+const PICTURES_ID = `${API_BASE}/pictures/id`;
+const USER_PFP = `${API_BASE}/user/pfp`;
 
 export interface GameSearchParameters {
   count: number;
@@ -66,7 +68,7 @@ export async function apiAccountLogout() {
   await axios.post(ACCOUNT_LOGOUT, {token: getSessionToken()});
 }
 
-export interface ApiEntry {
+export interface PictureInfo {
   id: number;
   previewURL: string;
   webformatURL: string;
@@ -77,7 +79,17 @@ export interface ApiEntry {
   likes: string[];
 }
 
-export async function apiPictureSearch(searchString: string): Promise<ApiEntry[]> {
-  const response = await axios.get(PICTURES_SEARCH, { params: {q: searchString} });
+export async function apiPictureSearch(searchString: string): Promise<PictureInfo[]> {
+  const response = await axios.get(PICTURES_SEARCH, { params: { q: searchString } });
   return response.data;
+}
+
+export async function apiPictureId(imageID: string): Promise<PictureInfo[]> {
+  const response = await axios.get(PICTURES_ID, { params: { id: imageID } });
+  return response.data;
+}
+
+export async function apiUserPfp(imageID: string): Promise<boolean> {
+  const response = await axios.put(USER_PFP, { body: { imageID: imageID }});
+  return response.data.success;
 }

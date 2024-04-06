@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import Nav from "../../Nav";
-import { ApiEntry, apiPictureSearch, validateLoggedIn } from "../../dao";
+import { PictureInfo, apiPictureSearch, validateLoggedIn } from "../../dao";
 import { Form } from "react-bootstrap";
 import { useNavigate } from "react-router";
 
@@ -9,7 +9,7 @@ function Search() {
   const [loggedIn, setLoggedIn] = useState<boolean>();
   const [searchString, setSearchString] = useState<string>('');
   const [hoveringOver, setHoveringOver] = useState<number>();
-  const [imageEntries, setImageEntries] = useState<ApiEntry[]>([]);
+  const [imageEntries, setImageEntries] = useState<PictureInfo[]>([]);
 
   useEffect(() => {
     validateLoggedIn(setLoggedIn);
