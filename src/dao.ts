@@ -114,7 +114,7 @@ export async function apiPictureSearch(
   return response.data;
 }
 
-export async function apiPictureId(imageID: string): Promise<PictureInfo[]> {
+export async function apiPictureId(imageID: string): Promise<PictureInfo> {
   const response = await axios.get(`${PICTURES_ID}/${imageID}`);
   return response.data;
 }

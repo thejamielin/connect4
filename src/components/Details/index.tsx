@@ -16,7 +16,7 @@ function Details() {
       setEntryData('invalid');
       return;
     }
-    apiPictureId(imageID).then(result => setEntryData(result[0])).catch(() => setEntryData('invalid'));
+    apiPictureId(imageID).then(result => setEntryData(result)).catch(() => setEntryData('invalid'));
   }, []);
 
   if (loggedIn === undefined || entryData === undefined) {
