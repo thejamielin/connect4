@@ -6,10 +6,10 @@ import { OtherProfile, SelfProfile } from "./components/Profile";
 import Login from "./components/Account/Login";
 import Search from "./components/Search";
 import Details from "./components/Details";
-import Game from "./components/Game";
 import { HashRouter } from "react-router-dom";
 import { Routes, Route, Navigate } from "react-router";
 import Register from "./components/Account/Register";
+import Game from "./components/Game";
 
 function App() {
   return (

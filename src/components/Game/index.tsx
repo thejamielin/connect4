@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 import Nav from "../../Nav";
-import { gameWebSocketURL, validateLoggedIn } from "../../dao";
+import { apiAccountGetUsername, gameWebSocketURL, validateLoggedIn } from "../../dao";
 import { Connect4Board } from "./connect4";
 import useWebSocket, { ReadyState } from "react-use-websocket";
 import { useParams } from "react-router";
+import { ClientRequest, GameData, GameCreationData, OngoingGameData } from "./gameData";
+import { Button } from "react-bootstrap";
 
 interface Connect4RendererProps {
   board: Connect4Board;
@@ -115,17 +117,58 @@ function Connect4Renderer({board, colors, lastMove, onClickSlot}: Connect4Render
   );
 }
 
-function Game() {
+function GameCreationPanel({ gameState, onReady }: { gameState: GameCreationData, onReady: () => void }) {
+  return (
+    <div>
+      <h1>Invite Friends with This Link: {'<nothing, bc f u>'}</h1>
+      <h4>Players: {JSON.stringify(gameState.playerIDs)}</h4>
+      <h4>Ready: {JSON.stringify(gameState.readyPlayerIDs)}</h4>
+      <Button onClick={onReady}>Ready!</Button>
+    </div>
+  )
+}
+
+interface GameplayPanelProps {
+  playerIndex: number;
+  gameState: OngoingGameData;
+  onMove: (col: number) => void;
+}
+
+function GameplayPanel({ playerIndex, gameState, onMove }: GameplayPanelProps) {
+  function onClickSlot(col: number, row: number) {
+    if (playerIndex === gameState.board.playerTurn && Connect4Board.canMove(gameState.board, col)) {
+      onMove(col);
+    }
+  }
+
+  return (
+    <div>
+      <h1>Play Game!</h1>
+      <div style={{display: 'flex', justifyContent: 'center'}}>
+        <div style={{height: '100%', width: '30%'}}>
+          <Connect4Renderer
+            board={gameState.board}
+            lastMove={gameState.board.lastMove}
+            colors={['red', 'yellow']}
+            onClickSlot={onClickSlot}
+          />
+        </div>
+      </div>
+    </div>
+  )
+}
+
+export default function Game() {
   const [loggedIn, setLoggedIn] = useState<boolean>();
+  const [username, setUsername] = useState<string>();
   const { gameID } = useParams();
   const [connectionSuccess, setConnectionSuccess] = useState<boolean>();
   const { sendMessage, lastMessage, readyState } = useWebSocket(gameID ? gameWebSocketURL(gameID) : null);
-  const [lastMove, setLastMove] = useState<Connect4Board.ExecutedMove>();
-  const [board, setBoard] = useState<Connect4Board>();
+  const [gameState, setGameState] = useState<GameData>();
 
   useEffect(() => {
     validateLoggedIn(setLoggedIn);
-    setBoard(Connect4Board.newBoard(4, 2, 7, 6));
+    apiAccountGetUsername().then(setUsername);
   }, []);
 
   useEffect(() => {
@@ -146,7 +189,7 @@ function Game() {
     return () => clearTimeout(timeout);
   }, [readyState]);
 
-  if (loggedIn === undefined || connectionSuccess === undefined || board === undefined) {
+  if (loggedIn === undefined || username === undefined || connectionSuccess === undefined) {
     return <div>Loading</div>;
   }
 
@@ -158,29 +201,28 @@ function Game() {
     );
   }
 
+  if (gameState === undefined) {
+    return <div>Loading (for game data)</div>
+  }
+
   // TODO: perhaps send an api request to ask if the game exists
   // if (gameID === undefined)
 
-  function onClickSlot(column: number, row: number) {
-    if (board === undefined) {
-      return;
-    }
-    const player = board.playerTurn;
-      Connect4Board.move(board, column);
-      const move = board.lastMove;
-      move && setLastMove(move);
+  function send(message: ClientRequest) {
+    sendMessage(JSON.stringify(message));
   }
 
   return (
     <div>
       <Nav loggedIn={loggedIn}/>
-      <h1>Game</h1>
-      <div style={{display: 'flex', justifyContent: 'center'}}>
-        <div style={{height: '100%', width: '30%'}}>
-          <Connect4Renderer board={board} colors={['blue', 'green', 'orange']} lastMove={lastMove} onClickSlot={onClickSlot}/>
-        </div>
-      </div>
+      {gameState.phase === 'creation' && <GameCreationPanel gameState={gameState} onReady={() => send({ type: 'ready' })}/>}
+      {gameState.phase === 'ongoing' && (
+        <GameplayPanel
+          playerIndex={gameState.playerIDs.findIndex(playerID => playerID === username)}
+          gameState={gameState}
+          onMove={column => send({ type: 'move', column })}
+        />
+      )}
     </div>
   );
 }
-export default Game;
