@@ -146,7 +146,7 @@ export async function apiCreateGame(): Promise<string> {
   const response = await axios.post(GAME, { token: getSessionToken() });
   return response.data.gameID;
 }
-export async function apiAccountGetUsername(): Promise<string> {
+export async function apiAccountGetUsername() {
   const response = await axios.post(ACCOUNT_GETUSERNAME, {
     token: getSessionToken(),
   });

@@ -4,7 +4,7 @@ import { apiAccountGetUsername, gameWebSocketURL, validateLoggedIn } from "../..
 import { Connect4Board } from "./connect4";
 import useWebSocket, { ReadyState } from "react-use-websocket";
 import { useParams } from "react-router";
-import { ClientRequest, GameData, GameCreationData, OngoingGameData } from "./gameData";
+import { ClientRequest, GameData, GameCreationData, OngoingGameData, ServerMessage } from "./gameData";
 import { Button } from "react-bootstrap";
 
 interface Connect4RendererProps {
@@ -172,7 +172,35 @@ export default function Game() {
   }, []);
 
   useEffect(() => {
-    console.log('msg: ', lastMessage)
+    if (lastMessage === null) {
+      return;
+    }
+    console.log(lastMessage.data)
+    const message: ServerMessage = JSON.parse(lastMessage.data);
+    if (message.type === 'state') {
+      console.log('setting it !')
+      setGameState(message.gameState);
+    }
+
+    if (gameState === undefined) {
+      return;
+    }
+
+    if (message.type === 'join') {
+      if (message.playerID !== username) {
+        setGameState({...gameState, playerIDs: [...gameState.playerIDs, message.playerID]});
+      }
+      // TODO: indication
+      console.log(message.playerID, ' has joined the game!');
+    } else if (message.type === 'ready') {
+      if (gameState.phase !== 'creation') {
+        console.error('A player has readied when the game already started?');
+        return;
+      }
+      setGameState({...gameState, readyPlayerIDs: [...gameState.readyPlayerIDs, message.playerID]});
+    } else if (message.type === 'gameover') {
+      alert('game over man')
+    }
   }, [lastMessage]);
 
   useEffect(() => {
