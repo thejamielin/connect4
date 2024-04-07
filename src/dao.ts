@@ -44,6 +44,8 @@ export function gameWebSocketURL(gameID: string) {
   return `${GAME_WEBSOCKET_URL}/${gameID}?token=${getSessionToken()}`;
 }
 
+const ACCOUNT_GETUSERNAME = `${API_BASE}/account`;
+
 export interface GameSearchParameters {
   count: number;
   sort?: "newest" | "oldest";
@@ -143,4 +145,17 @@ export async function apiSetUser(
 export async function apiCreateGame(): Promise<string> {
   const response = await axios.post(GAME, { token: getSessionToken() });
   return response.data.gameID;
+}
+export async function apiAccountGetUsername() {
+  const response = await axios.post(ACCOUNT_GETUSERNAME, {
+    token: getSessionToken(),
+  });
+  return response.data.username;
+}
+
+export async function apiGetUser(username : string) {
+  const response = await axios.post(`${USER}/${username}`, {
+    token: getSessionToken(),
+  });
+  return response.data;
 }

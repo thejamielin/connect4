@@ -2,7 +2,7 @@ import React from "react";
 import logo from "./logo.svg";
 import "./App.css";
 import Home from "./components/Home";
-import Profile from "./components/Profile";
+import { OtherProfile, SelfProfile } from "./components/Profile";
 import Login from "./components/Account/Login";
 import Search from "./components/Search";
 import Details from "./components/Details";
@@ -18,7 +18,8 @@ function App() {
         <Routes>
           <Route path="/" element={<Navigate to="/Home" />} />
           <Route path="/Home" element={<Home />} />
-          <Route path="/Profile" element={<Profile />} />
+          <Route path="/Profile/:username" element={<OtherProfile />} />
+          <Route path="/Profile" element={<SelfProfile />} />
           <Route path="/Login" element={<Login />} />
           <Route path="/Register" element={<Register />} />
           <Route path="/Search" element={<Search />} />
