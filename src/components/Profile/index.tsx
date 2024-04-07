@@ -57,7 +57,7 @@ function Profile({username, isChill} : {username : string, isChill: boolean}) {
     }).catch(() => {
       setDoesUserExist(false)
     })
-  }, []);
+  }, [username]);
 
   if (loggedIn === undefined || userData === undefined) {
     return <div>Loading</div>;
