@@ -33,7 +33,7 @@ const ACCOUNT_REGISTER = `${API_BASE}/account/register`;
 const ACCOUNT_CHECKSESSION = `${API_BASE}/account/checkSession`;
 const ACCOUNT_LOGOUT = `${API_BASE}/account/logout`;
 const PICTURES_SEARCH = `${API_BASE}/pictures/search`;
-const PICTURES_ID = `${API_BASE}/pictures/id`;
+const PICTURES_ID = `${API_BASE}/pictures`;
 const USER = `${API_BASE}/user`;
 
 export interface GameSearchParameters {
