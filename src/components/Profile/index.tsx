@@ -4,6 +4,7 @@ import {
   PictureInfo,
   User,
   apiAccountGetUsername,
+  apiGetCurrentSessionUser,
   apiGetUser,
   apiPictureId,
   apiSetUser,
@@ -57,12 +58,17 @@ function Profile({
   const [doesUserExist, setDoesUserExist] = useState<boolean>(true);
   const [loggedIn, setLoggedIn] = useState<boolean>();
   const [userData, setUserData] = useState<User>();
+  const [amIFollowing, setAmIFollowing] = useState<boolean>(false);
   const [profilePic, setProfilePic] = useState<PictureInfo>();
 
   const navigate = useNavigate();
 
   useEffect(() => {
     validateLoggedIn(setLoggedIn);
+
+    apiGetCurrentSessionUser().then((me) => {
+      setAmIFollowing(me.following.includes(username));
+    });
     apiGetUser(username)
       .then((userData: User) => {
         setUserData(userData);
@@ -97,6 +103,24 @@ function Profile({
     });
   };
 
+  const handleFollow = async () => {
+    const me = await apiGetCurrentSessionUser();
+    const ownFollowing = me.following;
+    if (ownFollowing.includes(username)) {
+      me.following = ownFollowing.filter(
+        (followee: string) => followee !== username
+      );
+    } else {
+      me.following.push(username);
+    }
+    apiSetUser({ following: me.following }).then((success) => {
+      if (!success) {
+        throw Error("Cannot update following list!");
+      }
+    });
+    setAmIFollowing(!amIFollowing);
+  };
+
   const chillUI = () => {
     return (
       <div>
@@ -119,7 +143,9 @@ function Profile({
         <h2>Followers</h2>
         <ul>
           {userData.following.map((follower: string) => (
-            <li key={follower}>{follower}</li>
+            <Link to={`/profile/${follower}`}>
+              <li key={follower}>{follower}</li>
+            </Link>
           ))}
         </ul>
       </div>
@@ -130,7 +156,9 @@ function Profile({
     return (
       <div>
         <p>Username: {username}</p>
-        <Button>Follow/Unfollow</Button>
+        <Button onClick={handleFollow}>
+          {amIFollowing ? "Unfollow" : "Follow"}
+        </Button>
         <h2>Followers</h2>
         <ul>
           {userData.following.map((follower: string) => (
