@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import Nav from "../../Nav";
-import { validateLoggedIn } from "../../dao";
+import { gameWebSocketURL, validateLoggedIn } from "../../dao";
 import { Connect4Board } from "./connect4";
+import useWebSocket, { ReadyState } from "react-use-websocket";
+import { useParams } from "react-router";
 
 interface Connect4RendererProps {
   board: Connect4Board;
@@ -115,6 +117,9 @@ function Connect4Renderer({board, colors, lastMove, onClickSlot}: Connect4Render
 
 function Game() {
   const [loggedIn, setLoggedIn] = useState<boolean>();
+  const { gameID } = useParams();
+  const [connectionSuccess, setConnectionSuccess] = useState<boolean>();
+  const { sendMessage, lastMessage, readyState } = useWebSocket(gameID ? gameWebSocketURL(gameID) : null);
   const [lastMove, setLastMove] = useState<Connect4Board.ExecutedMove>();
   const [board, setBoard] = useState<Connect4Board>();
 
@@ -123,9 +128,38 @@ function Game() {
     setBoard(Connect4Board.newBoard(4, 2, 7, 6));
   }, []);
 
-  if (loggedIn === undefined || board === undefined) {
+  useEffect(() => {
+    console.log('msg: ', lastMessage)
+  }, [lastMessage]);
+
+  useEffect(() => {
+    if (readyState === ReadyState.OPEN) {
+      setConnectionSuccess(true);
+    }
+    const timeout = setTimeout(() => {
+      if (readyState !== ReadyState.OPEN) {
+        setConnectionSuccess(false);
+      } else {
+        setConnectionSuccess(true);
+      }
+    }, 1000);
+    return () => clearTimeout(timeout);
+  }, [readyState]);
+
+  if (loggedIn === undefined || connectionSuccess === undefined || board === undefined) {
     return <div>Loading</div>;
   }
+
+  if (connectionSuccess === false) {
+    return (
+      <div>
+        Connection failed! Does this game exist?
+      </div>
+    );
+  }
+
+  // TODO: perhaps send an api request to ask if the game exists
+  // if (gameID === undefined)
 
   function onClickSlot(column: number, row: number) {
     if (board === undefined) {

@@ -1,17 +1,23 @@
 import Nav from "../../Nav";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import GameList from "./GameList";
 import { Button, Col, Container, Row, Stack } from "react-bootstrap";
 import { useEffect, useState } from "react";
-import { validateLoggedIn } from "../../dao";
+import { apiCreateGame, validateLoggedIn } from "../../dao";
 
 function StartGamePanel() {
+  const navigate = useNavigate();
+
+  async function onPlayWithFriend() {
+    apiCreateGame().then(gameID => navigate(`/game/${gameID}`));
+  }
+
   return (
     <div style={{borderStyle: 'solid', padding: '10px'}}>
       <h3>Play</h3>
       <Stack gap={2}>
         <Button>Random Match</Button>
-        <Button>Play with Friend</Button>
+        <Button onClick={onPlayWithFriend}>Play with Friend</Button>
       </Stack>
     </div>
   );

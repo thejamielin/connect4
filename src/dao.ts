@@ -35,6 +35,14 @@ const ACCOUNT_LOGOUT = `${API_BASE}/account/logout`;
 const PICTURES_SEARCH = `${API_BASE}/pictures/search`;
 const PICTURES_ID = `${API_BASE}/pictures`;
 const USER = `${API_BASE}/user`;
+const GAME = `${API_BASE}/game`;
+
+const WS_BASE = process.env.REACT_APP_WS_BASE
+const GAME_WEBSOCKET_URL = `${WS_BASE}/game`;
+
+export function gameWebSocketURL(gameID: string) {
+  return `${GAME_WEBSOCKET_URL}/${gameID}?token=${getSessionToken()}`;
+}
 
 export interface GameSearchParameters {
   count: number;
@@ -130,4 +138,9 @@ export async function apiSetUser(
     body: { token: getSessionToken(), editedFields: user },
   });
   return response.data.success;
+}
+
+export async function apiCreateGame(): Promise<string> {
+  const response = await axios.post(GAME, { token: getSessionToken() });
+  return response.data.gameID;
 }
