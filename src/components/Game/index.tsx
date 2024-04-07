@@ -3,17 +3,11 @@ import Nav from "../../Nav";
 import { validateLoggedIn } from "../../dao";
 import { Connect4Board } from "./connect4";
 
-interface Move {
-  player: number;
-  row: number;
-  column: number;
-}
-
 interface Connect4RendererProps {
   board: Connect4Board;
   colors: string[];
   onClickSlot: (column: number, row: number) => void;
-  lastMove?: Move;
+  lastMove?: Connect4Board.ExecutedMove;
 }
 
 function Connect4Slot({pieceColor}: {pieceColor?: string}) {
@@ -42,7 +36,7 @@ function Connect4Piece({pieceColor}: {pieceColor: string}) {
 }
 
 interface PieceAnimation {
-  player: number;
+  playerIndex: number;
   animatedVelocity: number;
   animatedHeight: number;
   column: number;
@@ -100,7 +94,7 @@ function Connect4Renderer({board, colors, lastMove, onClickSlot}: Connect4Render
           height: slotHeightPercent + '%',
           zIndex: -1
           }}>
-          <Connect4Piece pieceColor={colors[animation.player]}/>
+          <Connect4Piece pieceColor={colors[animation.playerIndex]}/>
         </div>
       )}
       {board.slots.map((row, i) => (
@@ -121,7 +115,7 @@ function Connect4Renderer({board, colors, lastMove, onClickSlot}: Connect4Render
 
 function Game() {
   const [loggedIn, setLoggedIn] = useState<boolean>();
-  const [lastMove, setLastMove] = useState<Move>();
+  const [lastMove, setLastMove] = useState<Connect4Board.ExecutedMove>();
   const [board, setBoard] = useState<Connect4Board>();
 
   useEffect(() => {
@@ -138,12 +132,9 @@ function Game() {
       return;
     }
     const player = board.playerTurn;
-      const rowLanded = Connect4Board.move(board, column);
-      setLastMove({
-        player: player,
-        column: column,
-        row: rowLanded
-      });
+      Connect4Board.move(board, column);
+      const move = board.lastMove;
+      move && setLastMove(move);
   }
 
   return (
