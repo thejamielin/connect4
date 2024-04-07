@@ -1,22 +1,29 @@
 import { useEffect, useState } from "react";
 import Nav from "../../Nav";
-import { PictureInfo, User, apiAccountGetUsername, apiGetUser, apiPictureId, apiSetUser, validateLoggedIn } from "../../dao";
+import {
+  PictureInfo,
+  User,
+  apiAccountGetUsername,
+  apiGetUser,
+  apiPictureId,
+  apiSetUser,
+  validateLoggedIn,
+} from "../../dao";
 import { useNavigate, useParams } from "react-router";
 import { Button } from "react-bootstrap";
+import { Link } from "react-router-dom";
 
 export function SelfProfile() {
-  const [username, setUsername] = useState()
+  const [username, setUsername] = useState();
   useEffect(() => {
     apiAccountGetUsername().then(setUsername);
   }, []);
 
-  if(!username) {
+  if (!username) {
     return <div>Loading</div>;
   }
 
-  return(
-    <Profile username={username} isChill={true}/>
-  )
+  return <Profile username={username} isChill={true} />;
 }
 
 export function OtherProfile() {
@@ -26,24 +33,27 @@ export function OtherProfile() {
   useEffect(() => {
     apiAccountGetUsername().then((currentUsername) => {
       // are we the person we're looking at?
-      const isChill = (currentUsername === username)
-      if(isChill) {
-        navigate('/profile')
+      const isChill = currentUsername === username;
+      if (isChill) {
+        navigate("/profile");
       }
-    })
-
+    });
   }, [username]);
 
-  if(!username) {
+  if (!username) {
     return <div>Loading</div>;
   }
 
-  return(
-    <Profile username={username} isChill={false}/>
-  )
+  return <Profile username={username} isChill={false} />;
 }
 
-function Profile({username, isChill} : {username : string, isChill: boolean}) {
+function Profile({
+  username,
+  isChill,
+}: {
+  username: string;
+  isChill: boolean;
+}) {
   const [doesUserExist, setDoesUserExist] = useState<boolean>(true);
   const [loggedIn, setLoggedIn] = useState<boolean>();
   const [userData, setUserData] = useState<User>();
@@ -53,16 +63,18 @@ function Profile({username, isChill} : {username : string, isChill: boolean}) {
 
   useEffect(() => {
     validateLoggedIn(setLoggedIn);
-    apiGetUser(username).then((userData : User) => {
-      setUserData(userData)
-      if(userData.pfp){
-        apiPictureId(userData.pfp).then((entry : PictureInfo) => {
-          setProfilePic(entry)
-        })
-      }
-    }).catch(() => {
-      setDoesUserExist(false)
-    })
+    apiGetUser(username)
+      .then((userData: User) => {
+        setUserData(userData);
+        if (userData.pfp) {
+          apiPictureId(userData.pfp).then((entry: PictureInfo) => {
+            setProfilePic(entry);
+          });
+        }
+      })
+      .catch(() => {
+        setDoesUserExist(false);
+      });
   }, [username]);
 
   if (loggedIn === undefined || userData === undefined) {
@@ -78,12 +90,12 @@ function Profile({username, isChill} : {username : string, isChill: boolean}) {
   }
 
   const handleEmailChange = async () => {
-    apiSetUser({email: userData.email}).then((success) => {
-      if(!success) {
-        throw Error("Cannot update email!")
+    apiSetUser({ email: userData.email }).then((success) => {
+      if (!success) {
+        throw Error("Cannot update email!");
       }
-    })
-  }
+    });
+  };
 
   const chillUI = () => {
     return (
@@ -97,13 +109,13 @@ function Profile({username, isChill} : {username : string, isChill: boolean}) {
               id="email-field"
               title="Email field"
               value={userData.email}
-              onChange={(e) => setUserData({...userData, email: e.target.value})}
+              onChange={(e) =>
+                setUserData({ ...userData, email: e.target.value })
+              }
             />
           </label>
         </form>
-        <Button onClick={handleEmailChange}>
-            Change Email
-        </Button>
+        <Button onClick={handleEmailChange}>Change Email</Button>
         <h2>Followers</h2>
         <ul>
           {userData.following.map((follower: string) => (
@@ -111,8 +123,8 @@ function Profile({username, isChill} : {username : string, isChill: boolean}) {
           ))}
         </ul>
       </div>
-    )
-  }
+    );
+  };
 
   const notChillUI = () => {
     return (
@@ -126,14 +138,21 @@ function Profile({username, isChill} : {username : string, isChill: boolean}) {
           ))}
         </ul>
       </div>
-    )
-  }
+    );
+  };
 
   return (
     <div>
       <Nav loggedIn={loggedIn} />
       <h1>Profile</h1>
-      {profilePic && <img src={profilePic.previewURL} style={{objectFit: 'fill', height: '100%'}}/>}
+      {profilePic && (
+        <Link to={`/details/${userData.pfp}`}>
+          <img
+            src={profilePic.previewURL}
+            style={{ objectFit: "fill", height: "100%" }}
+          />
+        </Link>
+      )}
       {isChill ? chillUI() : notChillUI()}
     </div>
   );
