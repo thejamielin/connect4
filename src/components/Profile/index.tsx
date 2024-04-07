@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import Nav from "../../Nav";
-import { apiAccountGetUsername, apiGetUser, validateLoggedIn } from "../../dao";
+import { PictureInfo, User, apiAccountGetUsername, apiGetUser, apiPictureId, apiSetUser, validateLoggedIn } from "../../dao";
 import { useNavigate, useParams } from "react-router";
 import { Button } from "react-bootstrap";
 
@@ -46,18 +46,24 @@ export function OtherProfile() {
 function Profile({username, isChill} : {username : string, isChill: boolean}) {
   const [doesUserExist, setDoesUserExist] = useState<boolean>(true);
   const [loggedIn, setLoggedIn] = useState<boolean>();
-  const [userData, setUserData] = useState<any>();
+  const [userData, setUserData] = useState<User>();
+  const [profilePic, setProfilePic] = useState<PictureInfo>();
 
   const navigate = useNavigate();
 
   useEffect(() => {
     validateLoggedIn(setLoggedIn);
-    apiGetUser(username).then((userData) => {
+    apiGetUser(username).then((userData : User) => {
       setUserData(userData)
+      if(userData.pfp){
+        apiPictureId(userData.pfp).then((entry : PictureInfo) => {
+          setProfilePic(entry)
+        })
+      }
     }).catch(() => {
       setDoesUserExist(false)
     })
-  }, []);
+  }, [username]);
 
   if (loggedIn === undefined || userData === undefined) {
     return <div>Loading</div>;
@@ -69,6 +75,14 @@ function Profile({username, isChill} : {username : string, isChill: boolean}) {
         <Button onClick={() => navigate("/Home")}>Go Home</Button>
       </div>
     );
+  }
+
+  const handleEmailChange = async () => {
+    apiSetUser({email: userData.email}).then((success) => {
+      if(!success) {
+        throw Error("Cannot update email!")
+      }
+    })
   }
 
   const chillUI = () => {
@@ -87,6 +101,9 @@ function Profile({username, isChill} : {username : string, isChill: boolean}) {
             />
           </label>
         </form>
+        <Button onClick={handleEmailChange}>
+            Change Email
+        </Button>
         <h2>Followers</h2>
         <ul>
           {userData.following.map((follower: string) => (
@@ -116,6 +133,7 @@ function Profile({username, isChill} : {username : string, isChill: boolean}) {
     <div>
       <Nav loggedIn={loggedIn} />
       <h1>Profile</h1>
+      {profilePic && <img src={profilePic.previewURL} style={{objectFit: 'fill', height: '100%'}}/>}
       {isChill ? chillUI() : notChillUI()}
     </div>
   );
