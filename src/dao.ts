@@ -35,6 +35,7 @@ const ACCOUNT_LOGOUT = `${API_BASE}/account/logout`;
 const PICTURES_SEARCH = `${API_BASE}/pictures/search`;
 const PICTURES_ID = `${API_BASE}/pictures`;
 const USER = `${API_BASE}/user`;
+const ACCOUNT_GETUSERNAME = `${API_BASE}/account`;
 
 export interface GameSearchParameters {
   count: number;
@@ -130,4 +131,18 @@ export async function apiSetUser(
     body: { token: getSessionToken(), editedFields: user },
   });
   return response.data.success;
+}
+
+export async function apiAccountGetUsername() {
+  const response = await axios.post(ACCOUNT_GETUSERNAME, {
+    token: getSessionToken(),
+  });
+  return response.data.username;
+}
+
+export async function apiGetUser(username : string) {
+  const response = await axios.post(`${USER}/${username}`, {
+    token: getSessionToken(),
+  });
+  return response.data;
 }
