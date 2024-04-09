@@ -7,7 +7,7 @@ import { apiAccountLogin, cacheSessionToken } from "../../dao";
 export interface InputField {
   name : string,
   set : (input : string) => void, 
-  value : string,
+  value : string | undefined,
   hide? : boolean
 }
 

@@ -75,12 +75,14 @@ export async function apiAccountLogin(
 export async function apiAccountRegister(
   username: string,
   password: string,
-  email: string
+  email: string,
+  isBeginner: boolean
 ): Promise<string> {
   const response = await axios.post(ACCOUNT_REGISTER, {
     username: username,
     password: password,
     email: email,
+    isBeginner: isBeginner
   });
   return response.data.token;
 }
