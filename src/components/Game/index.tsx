@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Nav from "../../Nav";
 import { apiAccountGetUsername, gameWebSocketURL, validateLoggedIn } from "../../dao";
 import { Connect4Board } from "./connect4";
@@ -104,7 +104,7 @@ function Connect4Renderer({board, colors, lastMove, onClickSlot}: Connect4Render
       {board.slots.map((row, i) => (
         <div style={{height: slotHeightPercent + '%', width: '100%', display: 'flex'}} key={i}>
           {row.map((slot, j) => {
-            const pieceColor = (slot === undefined || (animation && i === animation.row && j === animation.column)) ? undefined : colors[slot];
+            const pieceColor = (slot === false || (animation && i === animation.row && j === animation.column)) ? undefined : colors[slot];
             return (
               <div style={{width: slotWidthPercent + '%', height: '100%'}} key={j} onMouseDown={() => onClickSlot(j, i)}>
                 <Connect4Slot key={j} pieceColor={pieceColor}/>
@@ -121,8 +121,8 @@ function GameCreationPanel({ gameState, onReady }: { gameState: GameCreationData
   return (
     <div>
       <h1>Invite Friends with This Link: {'<nothing, bc f u>'}</h1>
-      <h4>Players: {JSON.stringify(gameState.playerIDs)}</h4>
-      <h4>Ready: {JSON.stringify(gameState.readyPlayerIDs)}</h4>
+      <h4>Players: {JSON.stringify(gameState.connectedIDs)}</h4>
+      <h4>Ready: {JSON.stringify(gameState.readyIDs)}</h4>
       <Button onClick={onReady}>Ready!</Button>
     </div>
   )
@@ -136,6 +136,8 @@ interface GameplayPanelProps {
 
 function GameplayPanel({ playerIndex, gameState, onMove }: GameplayPanelProps) {
   function onClickSlot(col: number, row: number) {
+    console.log('players', playerIndex, gameState.board.playerTurn)
+    console.log(Connect4Board.canMove(gameState.board, col));
     if (playerIndex === gameState.board.playerTurn && Connect4Board.canMove(gameState.board, col)) {
       onMove(col);
     }
@@ -146,6 +148,8 @@ function GameplayPanel({ playerIndex, gameState, onMove }: GameplayPanelProps) {
       <h1>Play Game!</h1>
       <div style={{display: 'flex', justifyContent: 'center'}}>
         <div style={{height: '100%', width: '30%'}}>
+          <div>Connected: {JSON.stringify(gameState.connectedIDs)}</div>
+          <div>Players: {JSON.stringify(gameState.playerIDs)}</div>
           <Connect4Renderer
             board={gameState.board}
             lastMove={gameState.board.lastMove}
@@ -163,12 +167,14 @@ export default function Game() {
   const [username, setUsername] = useState<string>();
   const { gameID } = useParams();
   const [connectionSuccess, setConnectionSuccess] = useState<boolean>();
-  const { sendMessage, lastMessage, readyState } = useWebSocket(gameID ? gameWebSocketURL(gameID) : null);
+  const didUnmount = useRef(false);
+  const { sendMessage, lastMessage, readyState } = useWebSocket(gameID ? gameWebSocketURL(gameID) : null, { shouldReconnect: () => didUnmount.current === false});
   const [gameState, setGameState] = useState<GameData>();
 
   useEffect(() => {
     validateLoggedIn(setLoggedIn);
     apiAccountGetUsername().then(setUsername);
+    return () => { didUnmount.current = true };
   }, []);
 
   useEffect(() => {
@@ -180,6 +186,8 @@ export default function Game() {
     if (message.type === 'state') {
       console.log('setting it !')
       setGameState(message.gameState);
+    } else if (message.type === 'move') {
+      setGameState(message.gameState);
     }
 
     if (gameState === undefined) {
@@ -187,18 +195,18 @@ export default function Game() {
     }
 
     if (message.type === 'join') {
-      if (message.playerID !== username) {
-        setGameState({...gameState, playerIDs: [...gameState.playerIDs, message.playerID]});
+      if (!gameState.connectedIDs.find(id => id === message.playerID)) {
+        setGameState({...gameState, connectedIDs: [...gameState.connectedIDs, message.playerID]});
       }
       // TODO: indication
     } else if (message.type === 'leave') {
-      setGameState({...gameState, playerIDs: gameState.playerIDs.filter(id => id !== message.playerID)});
+      setGameState({...gameState, connectedIDs: gameState.connectedIDs.filter(id => id !== message.playerID)});
     } else if (message.type === 'ready') {
       if (gameState.phase !== 'creation') {
         console.error('A player has readied when the game already started?');
         return;
       }
-      setGameState({...gameState, readyPlayerIDs: [...gameState.readyPlayerIDs, message.playerID]});
+      setGameState({...gameState, readyIDs: [...gameState.readyIDs, message.playerID]});
     } else if (message.type === 'gameover') {
       alert('game over man')
     }
@@ -238,12 +246,14 @@ export default function Game() {
   // if (gameID === undefined)
 
   function send(message: ClientRequest) {
+    console.log('sending message')
     sendMessage(JSON.stringify(message));
   }
 
   return (
     <div>
       <Nav loggedIn={loggedIn}/>
+      {readyState !== ReadyState.OPEN && <div>Connecting...</div>}
       {gameState.phase === 'creation' && <GameCreationPanel gameState={gameState} onReady={() => send({ type: 'ready' })}/>}
       {gameState.phase === 'ongoing' && (
         <GameplayPanel

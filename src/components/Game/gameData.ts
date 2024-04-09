@@ -2,17 +2,18 @@ import { Connect4Board } from "./connect4";
 
 export interface CommonGameData {
   id: string;
-  playerIDs: string[];
+  connectedIDs: string[];
 }
 
 export interface GameCreationData extends CommonGameData {
   phase: 'creation';
-  readyPlayerIDs: string[];
+  readyIDs: string[];
 }
 
 export interface OngoingGameData extends CommonGameData {
   phase: 'ongoing';
   board: Connect4Board;
+  playerIDs: string[];
 }
 
 export interface EndedGameData extends CommonGameData {
