@@ -37,7 +37,7 @@ const PICTURES_ID = `${API_BASE}/pictures`;
 const USER = `${API_BASE}/user`;
 const GAME = `${API_BASE}/game`;
 
-const WS_BASE = process.env.REACT_APP_WS_BASE
+const WS_BASE = process.env.REACT_APP_WS_BASE;
 const GAME_WEBSOCKET_URL = `${WS_BASE}/game`;
 
 export function gameWebSocketURL(gameID: string) {
@@ -75,12 +75,14 @@ export async function apiAccountLogin(
 export async function apiAccountRegister(
   username: string,
   password: string,
-  email: string
+  email: string,
+  isBeginner: boolean
 ): Promise<string> {
   const response = await axios.post(ACCOUNT_REGISTER, {
     username: username,
     password: password,
     email: email,
+    isBeginner: isBeginner
   });
   return response.data.token;
 }
@@ -153,9 +155,15 @@ export async function apiAccountGetUsername() {
   return response.data.username;
 }
 
-export async function apiGetUser(username : string) {
+export async function apiGetUser(username: string) {
   const response = await axios.post(`${USER}/${username}`, {
     token: getSessionToken(),
   });
   return response.data;
+}
+
+export async function apiGetCurrentSessionUser() {
+  return await apiAccountGetUsername().then((username) => {
+    return apiGetUser(username);
+  });
 }

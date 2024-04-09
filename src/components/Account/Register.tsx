@@ -6,9 +6,10 @@ import { apiAccountRegister, cacheSessionToken, validateLoggedIn } from "../../d
 
 export default function Register() {
   const navigate = useNavigate();
-  const [username, setUsername] = useState<string>('');
-  const [password, setPassword] = useState<string>('');
-  const [email, setEmail] = useState<string>('');
+  const [username, setUsername] = useState<string>();
+  const [password, setPassword] = useState<string>();
+  const [email, setEmail] = useState<string>();
+  const [isBeginner, setIsBeginner] = useState<boolean>(false);
   const [loggedIn, setLoggedIn] = useState<boolean>();
 
   useEffect(() => {
@@ -39,10 +40,10 @@ export default function Register() {
   ]
 
   function register() {
-    if (!username || !password) {
+    if (!username || !password || !email) {
       return;
     }
-    apiAccountRegister(username, password, email).then(token => {
+    apiAccountRegister(username, password, email, isBeginner).then(token => {
       cacheSessionToken(token);
       navigate('/home');
     }).catch(() => {
@@ -56,6 +57,7 @@ export default function Register() {
       <h1>Register</h1>
       <div style={{display: 'flex', flexDirection: 'column'}}>
         <Inputs fields={FIELDS}/>
+        <label>Are you a beginner? <input type="checkbox"/></label>
         <button onClick={register}>Register</button>
         <button onClick={() => navigate('/login')}>Go Login</button>
       </div>
