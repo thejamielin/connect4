@@ -14,18 +14,6 @@ export function getSessionToken(): string | undefined {
   return localStorage.getItem(COOKIE_TOKEN_NAME) || undefined;
 }
 
-export function validateLoggedIn(setLoggedIn: (isLoggedIn: boolean) => void) {
-  const token = getSessionToken();
-  if (!token) {
-    setLoggedIn(false);
-    return;
-  }
-  apiAccountCheckSession(token).then((isValidSession) => {
-    setLoggedIn(isValidSession);
-    isValidSession || deleteSessionToken();
-  });
-}
-
 const API_BASE = process.env.REACT_APP_API_BASE;
 const GAMES_SEARCH = `${API_BASE}/games/search`;
 const ACCOUNT_LOGIN = `${API_BASE}/account/login`;
@@ -36,6 +24,7 @@ const PICTURES_SEARCH = `${API_BASE}/pictures/search`;
 const PICTURES_ID = `${API_BASE}/pictures`;
 const USER = `${API_BASE}/user`;
 const GAME = `${API_BASE}/game`;
+const ACCOUNT_GETUSERDATA = `${API_BASE}/account`;
 
 const WS_BASE = process.env.REACT_APP_WS_BASE;
 const GAME_WEBSOCKET_URL = `${WS_BASE}/game`;
@@ -43,8 +32,6 @@ const GAME_WEBSOCKET_URL = `${WS_BASE}/game`;
 export function gameWebSocketURL(gameID: string) {
   return `${GAME_WEBSOCKET_URL}/${gameID}?token=${getSessionToken()}`;
 }
-
-const ACCOUNT_GETUSERNAME = `${API_BASE}/account`;
 
 export interface GameSearchParameters {
   count: number;
@@ -148,12 +135,6 @@ export async function apiCreateGame(): Promise<string> {
   const response = await axios.post(GAME, { token: getSessionToken() });
   return response.data.gameID;
 }
-export async function apiAccountGetUsername() {
-  const response = await axios.post(ACCOUNT_GETUSERNAME, {
-    token: getSessionToken(),
-  });
-  return response.data.username;
-}
 
 export async function apiGetUser(username: string) {
   const response = await axios.post(`${USER}/${username}`, {
@@ -162,8 +143,12 @@ export async function apiGetUser(username: string) {
   return response.data;
 }
 
-export async function apiGetCurrentSessionUser() {
-  return await apiAccountGetUsername().then((username) => {
-    return apiGetUser(username);
-  });
+export async function apiGetCurrentSessionUser() : Promise<User | false> {
+  return await axios.post(ACCOUNT_GETUSERDATA, {
+    token: getSessionToken(),
+  }).then((response) => {
+    return response.data
+  }).catch(() => {
+    return false
+  })
 }

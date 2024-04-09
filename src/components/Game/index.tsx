@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import Nav from "../../Nav";
-import { gameWebSocketURL, validateLoggedIn } from "../../dao";
+import { apiGetCurrentSessionUser, gameWebSocketURL } from "../../dao";
 import { Connect4Board } from "./connect4";
 import useWebSocket, { ReadyState } from "react-use-websocket";
 import { useParams } from "react-router";
@@ -124,8 +124,9 @@ function Game() {
   const [board, setBoard] = useState<Connect4Board>();
 
   useEffect(() => {
-    validateLoggedIn(setLoggedIn);
-    setBoard(Connect4Board.newBoard(4, 2, 7, 6));
+    apiGetCurrentSessionUser().then((data) => {
+      setLoggedIn(!!data)
+    })
   }, []);
 
   useEffect(() => {

@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import GameList from "./GameList";
 import { Button, Col, Container, Row, Stack } from "react-bootstrap";
 import { useEffect, useState } from "react";
-import { apiCreateGame, validateLoggedIn } from "../../dao";
+import { apiCreateGame, apiGetCurrentSessionUser } from "../../dao";
 
 function StartGamePanel() {
   const navigate = useNavigate();
@@ -27,7 +27,9 @@ function Home() {
   const [loggedIn, setLoggedIn] = useState<boolean>();
 
   useEffect(() => {
-    validateLoggedIn(setLoggedIn)
+    apiGetCurrentSessionUser().then((data) => {
+      setLoggedIn(!!data)
+    })
   }, []);
 
   if (loggedIn === undefined) {
