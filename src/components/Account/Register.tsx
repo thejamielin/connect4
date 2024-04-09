@@ -10,6 +10,7 @@ export default function Register() {
   const [password, setPassword] = useState<string>();
   const [email, setEmail] = useState<string>();
   const [isBeginner, setIsBeginner] = useState<boolean>(false);
+  const [userExists, setUserExists] = useState<boolean>(false);
   const [loggedIn, setLoggedIn] = useState<boolean>();
 
   useEffect(() => {
@@ -36,7 +37,13 @@ export default function Register() {
       name: 'password',
       set: setPassword,
       value: password,
-      hide: true
+      type: "password"
+    },
+    {
+      name: 'beginner',
+      set: setIsBeginner,
+      value: isBeginner,
+      type: "checkbox"
     }
   ]
 
@@ -47,8 +54,10 @@ export default function Register() {
     apiAccountRegister(username, password, email, isBeginner).then(token => {
       cacheSessionToken(token);
       navigate('/home');
-    }).catch(() => {
-      // TODO: handle registration fail
+    }).catch((response) => {
+      if(response.response.status === 409) {
+        setUserExists(true)
+      }
     });
   }
 
@@ -58,7 +67,7 @@ export default function Register() {
       <h1>Register</h1>
       <div style={{display: 'flex', flexDirection: 'column'}}>
         <Inputs fields={FIELDS}/>
-        <label>Are you a beginner? <input type="checkbox"/></label>
+        {userExists && <p style={{color: "red"}}>User Already Exists!</p>}
         <button onClick={register}>Register</button>
         <button onClick={() => navigate('/login')}>Go Login</button>
       </div>

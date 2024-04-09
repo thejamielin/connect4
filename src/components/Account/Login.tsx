@@ -44,7 +44,7 @@ function Login() {
       name: "password",
       set: setPassword,
       value: password,
-      hide: true,
+      type: "password"
     },
   ];
   function login() {
