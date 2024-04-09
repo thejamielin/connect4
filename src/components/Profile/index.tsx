@@ -15,10 +15,20 @@ import { Button } from "react-bootstrap";
 import { Link } from "react-router-dom";
 
 export function SelfProfile() {
+  const navigate = useNavigate();
   const [username, setUsername] = useState();
+  const [loggedIn, setLoggedIn] = useState<boolean>();
+
   useEffect(() => {
-    apiAccountGetUsername().then(setUsername);
+    validateLoggedIn(setLoggedIn);
+    if(loggedIn){
+      apiAccountGetUsername().then(setUsername);
+    }
   }, []);
+
+  if (!loggedIn) {
+    navigate("/login")
+  }
 
   if (!username) {
     return <div>Loading</div>;
@@ -29,16 +39,23 @@ export function SelfProfile() {
 
 export function OtherProfile() {
   const navigate = useNavigate();
+  const [loggedIn, setLoggedIn] = useState<boolean>();
   const { username } = useParams();
 
   useEffect(() => {
-    apiAccountGetUsername().then((currentUsername) => {
-      // are we the person we're looking at?
-      const isChill = currentUsername === username;
-      if (isChill) {
-        navigate("/profile");
-      }
-    });
+    validateLoggedIn(setLoggedIn);
+  }, [])
+
+  useEffect(() => {
+    if(loggedIn) {
+      apiAccountGetUsername().then((currentUsername) => {
+        // are we the person we're looking at?
+        const isChill = currentUsername === username;
+        if (isChill) {
+          navigate("/profile");
+        }
+      });
+    }
   }, [username]);
 
   if (!username) {
@@ -66,9 +83,11 @@ function Profile({
   useEffect(() => {
     validateLoggedIn(setLoggedIn);
 
-    apiGetCurrentSessionUser().then((me) => {
-      setAmIFollowing(me.following.includes(username));
-    });
+    if(loggedIn) {
+      apiGetCurrentSessionUser().then((me) => {
+        setAmIFollowing(me.following.includes(username));
+      });
+    }
     apiGetUser(username)
       .then((userData: User) => {
         setUserData(userData);
@@ -156,9 +175,11 @@ function Profile({
     return (
       <div>
         <p>Username: {username}</p>
-        <Button onClick={handleFollow}>
-          {amIFollowing ? "Unfollow" : "Follow"}
-        </Button>
+        {loggedIn &&
+          <Button onClick={handleFollow}>
+            {amIFollowing ? "Unfollow" : "Follow"}
+          </Button>
+        } 
         <h2>Followers</h2>
         <ul>
           {userData.following.map((follower: string) => (
