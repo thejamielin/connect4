@@ -191,7 +191,8 @@ export default function Game() {
         setGameState({...gameState, playerIDs: [...gameState.playerIDs, message.playerID]});
       }
       // TODO: indication
-      console.log(message.playerID, ' has joined the game!');
+    } else if (message.type === 'leave') {
+      setGameState({...gameState, playerIDs: gameState.playerIDs.filter(id => id !== message.playerID)});
     } else if (message.type === 'ready') {
       if (gameState.phase !== 'creation') {
         console.error('A player has readied when the game already started?');
