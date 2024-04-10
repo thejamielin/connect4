@@ -78,7 +78,6 @@ function Profile({
 
   useEffect(() => {
     apiGetCurrentSessionUser().then((data) => {
-      console.log("AAH!")
       setCurrentUserData(data)
     })
   }, [])
