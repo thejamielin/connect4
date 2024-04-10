@@ -3,7 +3,7 @@ import axios from "axios";
 import { GameResult } from "../../types";
 import { apiGamesSearch } from "../../dao";
 
-function GameList() {
+function GameList({isBeginner} : {isBeginner : boolean}) {
   const [games, setGames] = useState<GameResult[]>([]);
   const searchParams = {
     count: 10,
@@ -15,10 +15,14 @@ function GameList() {
 
   return (
     <div style={{borderStyle: 'solid', padding: '10px', height: '100%'}}>
-      <h3>Game History</h3>
-      {games.map((game, i) => (
-        <GameListEntry game={game} key={i}/>
-      ))}
+      {!isBeginner ?
+      <>
+        <h3>Game History</h3>
+        {games.map((game, i) => (
+          <GameListEntry game={game} key={i}/>
+        ))}
+      </> :
+      <p>To play with other users and see their stats, create a non-beginner account!</p>}
     </div>
   );
 }

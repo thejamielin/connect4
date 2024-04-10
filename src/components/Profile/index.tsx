@@ -51,9 +51,11 @@ export function OtherProfile() {
       const isChill = userData.username === username;
       if (isChill) {
         navigate("/profile");
+        return
       }
+      userData.role === "beginner" && navigate("/home")
     }
-  }, [username]);
+  }, [userData, username]);
 
   if (!username) {
     return <div>Loading</div>;
