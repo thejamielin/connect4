@@ -1,5 +1,5 @@
 import axios from "axios";
-import { GameResult } from "./types";
+import { User, BeginnerUser, GameResult, RegularUser } from "./types";
 
 const COOKIE_TOKEN_NAME = "token";
 export function cacheSessionToken(token: string) {
@@ -69,7 +69,7 @@ export async function apiAccountRegister(
     username: username,
     password: password,
     email: email,
-    isBeginner: isBeginner
+    isBeginner: isBeginner,
   });
   return response.data.token;
 }
@@ -108,22 +108,10 @@ export async function apiPictureId(imageID: string): Promise<PictureInfo> {
   return response.data;
 }
 
-export interface User {
-  email: string;
-  beginner: boolean;
-  username: string;
-  following: string[];
-  stats: UserStats;
-  password: string;
-  pfp?: string;
-}
-
-export interface UserStats {
-  // TODO: Add stat fields
-}
-
 export async function apiSetUser(
-  user: Partial<Pick<User, "email" | "following" | "pfp">>
+  user:
+    | Partial<Pick<RegularUser, "email" | "following" | "pfp">>
+    | Partial<Pick<BeginnerUser, "email" | "pfp">>
 ): Promise<boolean> {
   const response = await axios.put(USER, {
     body: { token: getSessionToken(), editedFields: user },
@@ -143,12 +131,15 @@ export async function apiGetUser(username: string) {
   return response.data;
 }
 
-export async function apiGetCurrentSessionUser() : Promise<User | false> {
-  return await axios.post(ACCOUNT_GETUSERDATA, {
-    token: getSessionToken(),
-  }).then((response) => {
-    return response.data
-  }).catch(() => {
-    return false
-  })
+export async function apiGetCurrentSessionUser(): Promise<User | false> {
+  return await axios
+    .post(ACCOUNT_GETUSERDATA, {
+      token: getSessionToken(),
+    })
+    .then((response) => {
+      return response.data;
+    })
+    .catch(() => {
+      return false;
+    });
 }

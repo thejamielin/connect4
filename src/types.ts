@@ -7,3 +7,27 @@ export interface GameResult {
   //moves: Move[];
   date: Date;
 }
+
+export type User = RegularUser | BeginnerUser;
+
+export interface RegularUser {
+  email: string;
+  role: "regular";
+  username: string;
+  following: string[];
+  stats: UserStats;
+  password: string;
+  pfp?: string;
+}
+
+export interface BeginnerUser {
+  email: string;
+  role: "beginner";
+  username: string;
+  password: string;
+  pfp?: string;
+}
+
+export interface UserStats {
+  // TODO: Add stat fields
+}

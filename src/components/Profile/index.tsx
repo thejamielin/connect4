@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import Nav from "../../Nav";
 import {
   PictureInfo,
-  User,
   apiGetCurrentSessionUser,
   apiGetUser,
   apiPictureId,
@@ -11,6 +10,7 @@ import {
 import { useNavigate, useParams } from "react-router";
 import { Button } from "react-bootstrap";
 import { Link } from "react-router-dom";
+import { User } from "../../types";
 
 export function SelfProfile() {
   const navigate = useNavigate();
@@ -18,16 +18,16 @@ export function SelfProfile() {
 
   useEffect(() => {
     apiGetCurrentSessionUser().then((data) => {
-      setUserData(data)
-    })
-  }, [])
+      setUserData(data);
+    });
+  }, []);
 
   if (userData === undefined) {
     return <div>Loading</div>;
   }
 
   if (!userData) {
-    navigate("/login")
+    navigate("/login");
     return <div>Must be logged in. Redirecting...</div>;
   }
 
@@ -41,12 +41,12 @@ export function OtherProfile() {
 
   useEffect(() => {
     apiGetCurrentSessionUser().then((data) => {
-      setUserData(data)
-    })
+      setUserData(data);
+    });
   }, []);
 
   useEffect(() => {
-    if(userData) {
+    if (userData) {
       // are we the person we're looking at?
       const isChill = userData.username === username;
       if (isChill) {
@@ -78,13 +78,14 @@ function Profile({
 
   useEffect(() => {
     apiGetCurrentSessionUser().then((data) => {
-      setCurrentUserData(data)
-    })
-  }, [])
+      setCurrentUserData(data);
+    });
+  }, []);
 
   useEffect(() => {
-    if(currentUserData) {
-      setAmIFollowing(currentUserData.following.includes(username));
+    if (currentUserData) {
+      currentUserData.role === "regular" &&
+        setAmIFollowing(currentUserData.following.includes(username));
     }
     apiGetUser(username)
       .then((userData) => {
@@ -121,7 +122,7 @@ function Profile({
   };
 
   const handleFollow = async () => {
-    if(currentUserData){
+    if (currentUserData && currentUserData.role === "regular") {
       const ownFollowing = currentUserData.following;
       if (ownFollowing.includes(username)) {
         currentUserData.following = ownFollowing.filter(
@@ -158,14 +159,6 @@ function Profile({
           </label>
         </form>
         <Button onClick={handleEmailChange}>Change Email</Button>
-        <h2>Followers</h2>
-        <ul>
-          {userData.following.map((follower: string) => (
-            <Link to={`/profile/${follower}`}>
-              <li key={follower}>{follower}</li>
-            </Link>
-          ))}
-        </ul>
       </div>
     );
   };
@@ -174,17 +167,11 @@ function Profile({
     return (
       <div>
         <p>Username: {username}</p>
-        {currentUserData &&
+        {currentUserData && (
           <Button onClick={handleFollow}>
             {amIFollowing ? "Unfollow" : "Follow"}
           </Button>
-        } 
-        <h2>Followers</h2>
-        <ul>
-          {userData.following.map((follower: string) => (
-            <li key={follower}>{follower}</li>
-          ))}
-        </ul>
+        )}
       </div>
     );
   };
@@ -202,6 +189,18 @@ function Profile({
         </Link>
       )}
       {isChill ? chillUI() : notChillUI()}
+      {userData.role === "regular" && (
+        <>
+          <h2>Followers</h2>
+          <ul>
+            {userData.following.map((follower: string) => (
+              <Link to={`/profile/${follower}`}>
+                <li key={follower}>{follower}</li>
+              </Link>
+            ))}
+          </ul>
+        </>
+      )}
     </div>
   );
 }
