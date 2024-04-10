@@ -6,22 +6,18 @@ import { apiAccountLogin, cacheSessionToken } from "../../dao";
 
 export interface InputField {
   name : string,
-  set : (input : string) => void, 
-  value : string | undefined,
-  hide? : boolean
+  set : (input : any) => void, 
+  value : any,
+  type? : string
 }
 
 function Inputs({fields} : {fields : InputField[]}) {
-  const [username, setUsername] = useState<string>('');
-  const [password, setPassword] = useState<string>('');
-  const [email, setEmail] = useState<string>('');
-
   return (
     <div>
       <div style={{display: 'flex', flexDirection: 'column'}}>
         {
           fields.map((field : InputField, i) => (
-            <label key={i}>{field.name} <input type={field.hide ? "password" : undefined}
+            <label key={i}>{field.name} <input type={field.type}
                                        value={field.value}
                                        onChange={e => field.set(e.target.value)}/></label>
           ))

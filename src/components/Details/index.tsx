@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import Nav from "../../Nav";
 import { PictureInfo, apiGetCurrentSessionUser, apiPictureId, apiSetUser } from "../../dao";
-import { useParams } from "react-router";
+import { useNavigate, useParams } from "react-router";
 import { Button } from "react-bootstrap";
 
 function Details() {
@@ -9,6 +9,15 @@ function Details() {
   const [loggedIn, setLoggedIn] = useState<boolean>();
   const [entryData, setEntryData] = useState<PictureInfo | 'invalid'>();
   const [pfpSet, setPfpSet] = useState<boolean>(false);
+
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    apiGetCurrentSessionUser().then((data) => {
+      setLoggedIn(!!data)
+      !!data && data.role === "beginner" && navigate("/home")
+    })
+  }, []);
 
   useEffect(() => {
     apiGetCurrentSessionUser().then((data) => {
@@ -28,7 +37,7 @@ function Details() {
   if (entryData === 'invalid') {
     return (
       <div>
-        <Nav loggedIn={loggedIn}/>
+        <Nav loggedIn={loggedIn} isBeginner={false}/>
         <div style={{marginLeft: '5%', marginRight: '5%'}}>
           <h1>This image does not exist.</h1>
         </div>
@@ -52,7 +61,7 @@ function Details() {
 
   return (
     <div>
-      <Nav loggedIn={loggedIn}/>
+      <Nav loggedIn={loggedIn} isBeginner={false}/>
       <div style={{marginLeft: '5%', marginRight: '5%'}}>
         <h1>Details</h1>
         <div>

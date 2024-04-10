@@ -1,11 +1,12 @@
 import { useEffect, useRef, useState } from "react";
 import Nav from "../../Nav";
-import { User, apiGetCurrentSessionUser, gameWebSocketURL } from "../../dao";
+import { apiGetCurrentSessionUser, gameWebSocketURL } from "../../dao";
 import { Connect4Board } from "./connect4";
 import useWebSocket, { ReadyState } from "react-use-websocket";
 import { useParams } from "react-router";
 import { ClientRequest, GameData, GameCreationData, OngoingGameData, ServerMessage } from "./gameTypes";
 import { Button } from "react-bootstrap";
+import { User } from "../../types";
 
 interface Connect4RendererProps {
   board: Connect4Board;
@@ -255,9 +256,10 @@ export default function Game() {
     sendMessage(JSON.stringify(message));
   }
 
+  // TODO: Change isBeginner to check if actually a beginner here
   return (
     <div>
-      <Nav loggedIn={loggedIn}/>
+      <Nav loggedIn={loggedIn} isBeginner={false}/>
       {readyState !== ReadyState.OPEN && <div>Connecting...</div>}
       {gameState.phase === 'creation' && <GameCreationPanel gameState={gameState} onReady={() => send({ type: 'ready' })}/>}
       {gameState.phase === 'ongoing' && (

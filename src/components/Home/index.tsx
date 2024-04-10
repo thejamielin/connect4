@@ -5,7 +5,7 @@ import { Button, Col, Container, Row, Stack } from "react-bootstrap";
 import { useEffect, useState } from "react";
 import { apiCreateGame, apiGetCurrentSessionUser } from "../../dao";
 
-function StartGamePanel() {
+function StartGamePanel({isBeginner} : {isBeginner: boolean}) {
   const navigate = useNavigate();
 
   async function onPlayWithFriend() {
@@ -16,8 +16,12 @@ function StartGamePanel() {
     <div style={{borderStyle: 'solid', padding: '10px'}}>
       <h3>Play</h3>
       <Stack gap={2}>
-        <Button>Random Match</Button>
-        <Button onClick={onPlayWithFriend}>Play with Friend</Button>
+        {!isBeginner ? 
+        <>
+          <Button>Random Match</Button>
+          <Button onClick={onPlayWithFriend}>Play with Friend</Button>
+        </> :
+        <Button>Start New Game</Button>}
       </Stack>
     </div>
   );
@@ -25,29 +29,31 @@ function StartGamePanel() {
 
 function Home() {
   const [loggedIn, setLoggedIn] = useState<boolean>();
+  const [isBeginner, setIsBeginner] = useState<boolean>();
 
   useEffect(() => {
     apiGetCurrentSessionUser().then((data) => {
       setLoggedIn(!!data)
+      setIsBeginner(!!data && data.role === "beginner")
     })
   }, []);
 
-  if (loggedIn === undefined) {
+  if (loggedIn === undefined || isBeginner === undefined) {
     return <div>Loading</div>;
   }
   
   return (
     <div>
-      <Nav loggedIn={loggedIn}/>
+      <Nav loggedIn={loggedIn} isBeginner={isBeginner}/>
       <div>
         <Container style={{marginLeft: '5%', marginRight: '5%'}}>
           <h1>Home</h1>
           <Row>
             <Col className="col-8">
-              <StartGamePanel/>
+              <StartGamePanel isBeginner={isBeginner}/>
             </Col>
             <Col>
-              <GameList />
+              <GameList isBeginner={isBeginner} />
             </Col>
           </Row>
         </Container>
