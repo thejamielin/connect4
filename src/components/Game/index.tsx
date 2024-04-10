@@ -4,7 +4,7 @@ import { User, apiGetCurrentSessionUser, gameWebSocketURL } from "../../dao";
 import { Connect4Board } from "./connect4";
 import useWebSocket, { ReadyState } from "react-use-websocket";
 import { useParams } from "react-router";
-import { ClientRequest, GameData, GameCreationData, OngoingGameData, ServerMessage } from "./gameData";
+import { ClientRequest, GameData, GameCreationData, OngoingGameData, ServerMessage } from "./gameTypes";
 import { Button } from "react-bootstrap";
 
 interface Connect4RendererProps {
@@ -172,11 +172,14 @@ export default function Game() {
   const [gameState, setGameState] = useState<GameData>();
 
   useEffect(() => {
+    return () => { didUnmount.current = true };
+  }, []);
+
+  useEffect(() => {
     apiGetCurrentSessionUser().then((data: User | false) => {
       setLoggedIn(!!data);
       data && setUsername(data.username);
     });
-    return () => { didUnmount.current = true };
   }, []);
 
   useEffect(() => {
@@ -210,7 +213,7 @@ export default function Game() {
       }
       setGameState({...gameState, readyIDs: [...gameState.readyIDs, message.playerID]});
     } else if (message.type === 'gameover') {
-      alert('game over man')
+      // alert('game over man')
     }
   }, [lastMessage]);
 
