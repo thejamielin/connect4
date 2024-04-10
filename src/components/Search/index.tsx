@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import Nav from "../../Nav";
-import { PictureInfo, apiPictureSearch, validateLoggedIn } from "../../dao";
+import { PictureInfo, apiGetCurrentSessionUser, apiPictureSearch } from "../../dao";
 import { Form } from "react-bootstrap";
 import { useNavigate } from "react-router";
 
@@ -12,7 +12,9 @@ function Search() {
   const [imageEntries, setImageEntries] = useState<PictureInfo[]>([]);
 
   useEffect(() => {
-    validateLoggedIn(setLoggedIn);
+    apiGetCurrentSessionUser().then((data) => {
+      setLoggedIn(!!data)
+    })
     refreshSearchResults();
   }, []);
 

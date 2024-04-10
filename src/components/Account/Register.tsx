@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import Nav from "../../Nav";
 import Inputs from "./Inputs";
-import { apiAccountRegister, cacheSessionToken, validateLoggedIn } from "../../dao";
+import { apiAccountRegister, apiGetCurrentSessionUser, cacheSessionToken } from "../../dao";
 
 export default function Register() {
   const navigate = useNavigate();
@@ -13,8 +13,9 @@ export default function Register() {
   const [loggedIn, setLoggedIn] = useState<boolean>();
 
   useEffect(() => {
-    validateLoggedIn(setLoggedIn)
-  }, []);
+    apiGetCurrentSessionUser().then((data) => {
+      setLoggedIn(!!data)
+    })  }, []);
 
   if (loggedIn === undefined) {
     return <div>Loading</div>;

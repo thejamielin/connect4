@@ -5,10 +5,10 @@ import axios from "axios";
 import {
   apiAccountCheckSession,
   apiAccountLogin,
+  apiGetCurrentSessionUser,
   cacheSessionToken,
   deleteSessionToken,
   getSessionToken,
-  validateLoggedIn,
 } from "../../dao";
 import Inputs from "./Inputs";
 
@@ -19,7 +19,9 @@ function Login() {
   const [loggedIn, setLoggedIn] = useState<boolean>();
 
   useEffect(() => {
-    validateLoggedIn(setLoggedIn)
+    apiGetCurrentSessionUser().then((data) => {
+      setLoggedIn(!!data)
+    })
   }, []);
 
   useEffect(() => {

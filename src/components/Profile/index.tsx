@@ -3,42 +3,56 @@ import Nav from "../../Nav";
 import {
   PictureInfo,
   User,
-  apiAccountGetUsername,
   apiGetCurrentSessionUser,
   apiGetUser,
   apiPictureId,
   apiSetUser,
-  validateLoggedIn,
 } from "../../dao";
 import { useNavigate, useParams } from "react-router";
 import { Button } from "react-bootstrap";
 import { Link } from "react-router-dom";
 
 export function SelfProfile() {
-  const [username, setUsername] = useState();
-  useEffect(() => {
-    apiAccountGetUsername().then(setUsername);
-  }, []);
+  const navigate = useNavigate();
+  const [userData, setUserData] = useState<User | false>();
 
-  if (!username) {
+  useEffect(() => {
+    apiGetCurrentSessionUser().then((data) => {
+      setUserData(data)
+    })
+  }, [])
+
+  if (userData === undefined) {
     return <div>Loading</div>;
   }
 
-  return <Profile username={username} isChill={true} />;
+  if (!userData) {
+    navigate("/login")
+    return <div>Must be logged in. Redirecting...</div>;
+  }
+
+  return <Profile username={userData.username} isChill={true} />;
 }
 
 export function OtherProfile() {
   const navigate = useNavigate();
+  const [userData, setUserData] = useState<User | false>();
   const { username } = useParams();
 
   useEffect(() => {
-    apiAccountGetUsername().then((currentUsername) => {
+    apiGetCurrentSessionUser().then((data) => {
+      setUserData(data)
+    })
+  }, []);
+
+  useEffect(() => {
+    if(userData) {
       // are we the person we're looking at?
-      const isChill = currentUsername === username;
+      const isChill = userData.username === username;
       if (isChill) {
         navigate("/profile");
       }
-    });
+    }
   }, [username]);
 
   if (!username) {
@@ -55,22 +69,26 @@ function Profile({
   username: string;
   isChill: boolean;
 }) {
-  const [doesUserExist, setDoesUserExist] = useState<boolean>(true);
-  const [loggedIn, setLoggedIn] = useState<boolean>();
-  const [userData, setUserData] = useState<User>();
+  const [currentUserData, setCurrentUserData] = useState<User | false>();
+  const [userData, setUserData] = useState<User | false>();
   const [amIFollowing, setAmIFollowing] = useState<boolean>(false);
   const [profilePic, setProfilePic] = useState<PictureInfo>();
 
   const navigate = useNavigate();
 
   useEffect(() => {
-    validateLoggedIn(setLoggedIn);
+    apiGetCurrentSessionUser().then((data) => {
+      console.log("AAH!")
+      setCurrentUserData(data)
+    })
+  }, [])
 
-    apiGetCurrentSessionUser().then((me) => {
-      setAmIFollowing(me.following.includes(username));
-    });
+  useEffect(() => {
+    if(currentUserData) {
+      setAmIFollowing(currentUserData.following.includes(username));
+    }
     apiGetUser(username)
-      .then((userData: User) => {
+      .then((userData) => {
         setUserData(userData);
         if (userData.pfp) {
           apiPictureId(userData.pfp).then((entry: PictureInfo) => {
@@ -79,14 +97,14 @@ function Profile({
         }
       })
       .catch(() => {
-        setDoesUserExist(false);
+        setUserData(false);
       });
   }, [username]);
 
-  if (loggedIn === undefined || userData === undefined) {
+  if (currentUserData === undefined || userData === undefined) {
     return <div>Loading</div>;
   }
-  if (!doesUserExist) {
+  if (!userData) {
     return (
       <div>
         User {username} does not exist!
@@ -104,21 +122,22 @@ function Profile({
   };
 
   const handleFollow = async () => {
-    const me = await apiGetCurrentSessionUser();
-    const ownFollowing = me.following;
-    if (ownFollowing.includes(username)) {
-      me.following = ownFollowing.filter(
-        (followee: string) => followee !== username
-      );
-    } else {
-      me.following.push(username);
-    }
-    apiSetUser({ following: me.following }).then((success) => {
-      if (!success) {
-        throw Error("Cannot update following list!");
+    if(currentUserData){
+      const ownFollowing = currentUserData.following;
+      if (ownFollowing.includes(username)) {
+        currentUserData.following = ownFollowing.filter(
+          (followee: string) => followee !== username
+        );
+      } else {
+        currentUserData.following.push(username);
       }
-    });
-    setAmIFollowing(!amIFollowing);
+      apiSetUser({ following: currentUserData.following }).then((success) => {
+        if (!success) {
+          throw Error("Cannot update following list!");
+        }
+      });
+      setAmIFollowing(!amIFollowing);
+    }
   };
 
   const chillUI = () => {
@@ -156,9 +175,11 @@ function Profile({
     return (
       <div>
         <p>Username: {username}</p>
-        <Button onClick={handleFollow}>
-          {amIFollowing ? "Unfollow" : "Follow"}
-        </Button>
+        {currentUserData &&
+          <Button onClick={handleFollow}>
+            {amIFollowing ? "Unfollow" : "Follow"}
+          </Button>
+        } 
         <h2>Followers</h2>
         <ul>
           {userData.following.map((follower: string) => (
@@ -171,7 +192,7 @@ function Profile({
 
   return (
     <div>
-      <Nav loggedIn={loggedIn} />
+      <Nav loggedIn={!!currentUserData} />
       <h1>Profile</h1>
       {profilePic && (
         <Link to={`/details/${userData.pfp}`}>

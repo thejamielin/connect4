@@ -32,7 +32,11 @@ function GameListEntry({ game }: { game: GameResult }) {
   return (
     <div style={{borderStyle: 'solid', margin: '2%'}}>
       <div style={{fontSize: 20, backgroundColor: 'lightblue', width: '100%', justifyContent: 'center', display: 'flex'}}>
-        <div>{winIcon(game.player1)} {game.player1} <span style={{fontSize: 16}}>vs</span> {game.player2} {winIcon(game.player2)}</div>
+        <div>
+          <a href={`/#/profile/${game.player1}`}> {winIcon(game.player1)} {game.player1} </a>
+          <span style={{fontSize: 16}}>vs</span>
+          <a href={`/#/profile/${game.player2}`}> {game.player2}</a> {winIcon(game.player2)}
+        </div>
       </div>
     </div>
   );

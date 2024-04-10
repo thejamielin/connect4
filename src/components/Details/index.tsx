@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import Nav from "../../Nav";
-import { PictureInfo, apiPictureId, apiSetUser, validateLoggedIn } from "../../dao";
+import { PictureInfo, apiGetCurrentSessionUser, apiPictureId, apiSetUser } from "../../dao";
 import { useParams } from "react-router";
 import { Button } from "react-bootstrap";
 
@@ -11,7 +11,9 @@ function Details() {
   const [pfpSet, setPfpSet] = useState<boolean>(false);
 
   useEffect(() => {
-    validateLoggedIn(setLoggedIn);
+    apiGetCurrentSessionUser().then((data) => {
+      setLoggedIn(!!data)
+    })
     if (!imageID) {
       setEntryData('invalid');
       return;

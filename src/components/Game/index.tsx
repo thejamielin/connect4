@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import Nav from "../../Nav";
-import { apiAccountGetUsername, gameWebSocketURL, validateLoggedIn } from "../../dao";
+import { User, apiGetCurrentSessionUser, gameWebSocketURL } from "../../dao";
 import { Connect4Board } from "./connect4";
 import useWebSocket, { ReadyState } from "react-use-websocket";
 import { useParams } from "react-router";
@@ -172,8 +172,10 @@ export default function Game() {
   const [gameState, setGameState] = useState<GameData>();
 
   useEffect(() => {
-    validateLoggedIn(setLoggedIn);
-    apiAccountGetUsername().then(setUsername);
+    apiGetCurrentSessionUser().then((data: User | false) => {
+      setLoggedIn(!!data);
+      data && setUsername(data.username);
+    });
     return () => { didUnmount.current = true };
   }, []);
 
