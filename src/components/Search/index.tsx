@@ -14,6 +14,7 @@ function Search() {
   useEffect(() => {
     apiGetCurrentSessionUser().then((data) => {
       setLoggedIn(!!data)
+      data && data.role === "beginner" && navigate("/home")
     })
     refreshSearchResults();
   }, []);
@@ -28,7 +29,7 @@ function Search() {
 
   return (
     <div>
-      <Nav loggedIn={loggedIn}/>
+      <Nav loggedIn={loggedIn} isBeginner={false}/>
       <div style={{marginLeft: '5%', marginRight: '5%', position: 'relative'}}>
         <div style={{position: 'sticky', top: 0}}>
           <h1>Search Profile Pictures</h1>

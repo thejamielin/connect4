@@ -172,9 +172,10 @@ function Game() {
       move && setLastMove(move);
   }
 
+  // TODO: Change isBeginner to check if actually a beginner here
   return (
     <div>
-      <Nav loggedIn={loggedIn}/>
+      <Nav loggedIn={loggedIn} isBeginner={false}/>
       <h1>Game</h1>
       <div style={{display: 'flex', justifyContent: 'center'}}>
         <div style={{height: '100%', width: '30%'}}>

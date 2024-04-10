@@ -25,20 +25,22 @@ function StartGamePanel() {
 
 function Home() {
   const [loggedIn, setLoggedIn] = useState<boolean>();
+  const [isBeginner, setIsBeginner] = useState<boolean>();
 
   useEffect(() => {
     apiGetCurrentSessionUser().then((data) => {
       setLoggedIn(!!data)
+      setIsBeginner(!!data && data.role === "beginner")
     })
   }, []);
 
-  if (loggedIn === undefined) {
+  if (loggedIn === undefined || isBeginner === undefined) {
     return <div>Loading</div>;
   }
   
   return (
     <div>
-      <Nav loggedIn={loggedIn}/>
+      <Nav loggedIn={loggedIn} isBeginner={isBeginner}/>
       <div>
         <Container style={{marginLeft: '5%', marginRight: '5%'}}>
           <h1>Home</h1>

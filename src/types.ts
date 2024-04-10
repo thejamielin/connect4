@@ -25,7 +25,6 @@ export interface BeginnerUser {
   role: "beginner";
   username: string;
   password: string;
-  pfp?: string;
 }
 
 export interface UserStats {

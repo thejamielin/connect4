@@ -111,7 +111,7 @@ export async function apiPictureId(imageID: string): Promise<PictureInfo> {
 export async function apiSetUser(
   user:
     | Partial<Pick<RegularUser, "email" | "following" | "pfp">>
-    | Partial<Pick<BeginnerUser, "email" | "pfp">>
+    | Partial<Pick<BeginnerUser, "email">>
 ): Promise<boolean> {
   const response = await axios.put(USER, {
     body: { token: getSessionToken(), editedFields: user },

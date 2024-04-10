@@ -70,7 +70,7 @@ export default function Register() {
 
   return (
     <div>
-      <Nav loggedIn={loggedIn} />
+      <Nav loggedIn={false} isBeginner={false}/>
       <h1>Register</h1>
       <div style={{ display: "flex", flexDirection: "column" }}>
         <Inputs fields={FIELDS} />

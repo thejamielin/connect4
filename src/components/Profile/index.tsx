@@ -178,9 +178,10 @@ function Profile({
 
   return (
     <div>
-      <Nav loggedIn={!!currentUserData} />
+      <Nav loggedIn={!!currentUserData} 
+           isBeginner={currentUserData && currentUserData.role === "beginner"} />
       <h1>Profile</h1>
-      {profilePic && (
+      {userData.role === "regular" && profilePic && (
         <Link to={`/details/${userData.pfp}`}>
           <img
             src={profilePic.previewURL}

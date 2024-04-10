@@ -63,7 +63,7 @@ function Login() {
 
   return (
     <div>
-      <Nav loggedIn={loggedIn}/>
+      <Nav loggedIn={loggedIn} isBeginner={false}/>
       <h1>Login</h1>
       <div style={{ display: "flex", flexDirection: "column" }}>
         <Inputs fields={FIELDS} />
