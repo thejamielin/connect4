@@ -4,6 +4,7 @@ import GameList from "./GameList";
 import { Button, Col, Container, Row, Stack } from "react-bootstrap";
 import { useEffect, useState } from "react";
 import { apiCreateGame, apiGetCurrentSessionUser } from "../../dao";
+import { User } from "../../types";
 
 function StartGamePanel({isBeginner} : {isBeginner: boolean}) {
   const navigate = useNavigate();
@@ -28,19 +29,19 @@ function StartGamePanel({isBeginner} : {isBeginner: boolean}) {
 }
 
 function Home() {
-  const [loggedIn, setLoggedIn] = useState<boolean>();
-  const [isBeginner, setIsBeginner] = useState<boolean>();
+  const [userData, setUserData] = useState<User | false>();
 
   useEffect(() => {
     apiGetCurrentSessionUser().then((data) => {
-      setLoggedIn(!!data)
-      setIsBeginner(!!data && data.role === "beginner")
+      setUserData(data);
     })
   }, []);
 
-  if (loggedIn === undefined || isBeginner === undefined) {
+  if (userData === undefined) {
     return <div>Loading</div>;
   }
+
+  const [loggedIn, isBeginner] = [!!userData, userData && userData.role === 'beginner'];
   
   return (
     <div>
@@ -53,7 +54,9 @@ function Home() {
               <StartGamePanel isBeginner={isBeginner}/>
             </Col>
             <Col>
-              <GameList isBeginner={isBeginner} />
+              {userData && userData.role === 'beginner' ? (
+              <p>To play with other users and see their stats, create a non-beginner account!</p>
+              ) : <GameList userData={userData} />}
             </Col>
           </Row>
         </Container>

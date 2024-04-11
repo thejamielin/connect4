@@ -1,28 +1,33 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-import { GameResult } from "../../types";
+import { GameResult, RegularUser, User } from "../../types";
 import { apiGamesSearch } from "../../dao";
 
-function GameList({isBeginner} : {isBeginner : boolean}) {
-  const [games, setGames] = useState<GameResult[]>([]);
-  const searchParams = {
-    count: 10,
+export interface GameSearchParameters {
+  count: number;
+  sort?: "newest" | "oldest";
+  filter?: {
+    players?: string[];
   };
+}
 
+function GameList({userData} : {userData : RegularUser | false}) {
+  const [games, setGames] = useState<GameResult[]>([]);
+  
   useEffect(() => {
-    apiGamesSearch({count: 10}).then(setGames);
+    let searchParams: GameSearchParameters = { count: 10, sort: 'newest' };
+    if (userData) {
+      searchParams.filter = { players: [userData.username] };
+    }
+    apiGamesSearch(searchParams).then(setGames);
   }, []);
 
   return (
     <div style={{borderStyle: 'solid', padding: '10px', height: '100%'}}>
-      {!isBeginner ?
-      <>
-        <h3>Game History</h3>
-        {games.map((game, i) => (
-          <GameListEntry game={game} key={i}/>
-        ))}
-      </> :
-      <p>To play with other users and see their stats, create a non-beginner account!</p>}
+      <h3>Game History</h3>
+      {games.map((game, i) => (
+        <GameListEntry game={game} key={i}/>
+      ))}
     </div>
   );
 }
