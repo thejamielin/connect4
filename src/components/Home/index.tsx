@@ -6,23 +6,35 @@ import { useEffect, useState } from "react";
 import { apiCreateGame, apiGetCurrentSessionUser } from "../../dao";
 import { User } from "../../types";
 
-function StartGamePanel({isBeginner} : {isBeginner: boolean}) {
+function StartGamePanel({
+  isBeginner,
+  loggedIn,
+}: {
+  isBeginner: boolean;
+  loggedIn: boolean;
+}) {
   const navigate = useNavigate();
 
   async function onPlayWithFriend() {
-    apiCreateGame().then(gameID => navigate(`/game/${gameID}`));
+    if (!loggedIn) {
+      navigate("/login");
+      return;
+    }
+    apiCreateGame().then((gameID) => navigate(`/game/${gameID}`));
   }
 
   return (
-    <div style={{borderStyle: 'solid', padding: '10px'}}>
+    <div style={{ borderStyle: "solid", padding: "10px" }}>
       <h3>Play</h3>
       <Stack gap={2}>
-        {!isBeginner ? 
-        <>
-          <Button>Random Match</Button>
-          <Button onClick={onPlayWithFriend}>Play with Friend</Button>
-        </> :
-        <Button>Start New Game</Button>}
+        {!isBeginner ? (
+          <>
+            <Button>Random Match</Button>
+            <Button onClick={onPlayWithFriend}>Play with Friend</Button>
+          </>
+        ) : (
+          <Button>Start New Game</Button>
+        )}
       </Stack>
     </div>
   );
@@ -34,29 +46,37 @@ function Home() {
   useEffect(() => {
     apiGetCurrentSessionUser().then((data) => {
       setUserData(data);
-    })
+    });
   }, []);
 
   if (userData === undefined) {
     return <div>Loading</div>;
   }
 
-  const [loggedIn, isBeginner] = [!!userData, userData && userData.role === 'beginner'];
-  
+  const [loggedIn, isBeginner] = [
+    !!userData,
+    userData && userData.role === "beginner",
+  ];
+
   return (
     <div>
-      <Nav loggedIn={loggedIn} isBeginner={isBeginner}/>
+      <Nav loggedIn={loggedIn} isBeginner={isBeginner} />
       <div>
-        <Container style={{marginLeft: '5%', marginRight: '5%'}}>
+        <Container style={{ marginLeft: "5%", marginRight: "5%" }}>
           <h1>Home</h1>
           <Row>
             <Col className="col-8">
-              <StartGamePanel isBeginner={isBeginner}/>
+              <StartGamePanel loggedIn={loggedIn} isBeginner={isBeginner} />
             </Col>
             <Col>
-              {userData && userData.role === 'beginner' ? (
-              <p>To play with other users and see their stats, create a non-beginner account!</p>
-              ) : <GameList userData={userData} />}
+              {userData && userData.role === "beginner" ? (
+                <p>
+                  To play with other users and see their stats, create a
+                  non-beginner account!
+                </p>
+              ) : (
+                <GameList userData={userData} />
+              )}
             </Col>
           </Row>
         </Container>
