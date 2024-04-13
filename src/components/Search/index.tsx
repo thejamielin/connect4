@@ -3,8 +3,10 @@ import Nav from "../../Nav";
 import { PictureInfo, apiGetCurrentSessionUser, apiPictureSearch } from "../../dao";
 import { Form } from "react-bootstrap";
 import { useNavigate } from "react-router";
+import { useSearchParams } from "react-router-dom";
 
 function Search() {
+  const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   const [loggedIn, setLoggedIn] = useState<boolean>();
   const [searchString, setSearchString] = useState<string>('');
@@ -16,12 +18,8 @@ function Search() {
       setLoggedIn(!!data)
       data && data.role === "beginner" && navigate("/home")
     })
-    refreshSearchResults();
-  }, []);
-
-  function refreshSearchResults() {
-    apiPictureSearch(searchString).then(result => setImageEntries(result));
-  }
+    apiPictureSearch(searchParams.get("search") || "").then(result => setImageEntries(result));
+  }, [searchParams]);
 
   if (loggedIn === undefined) {
     return <div>Loading</div>;
@@ -35,7 +33,8 @@ function Search() {
           <h1>Search Profile Pictures</h1>
           <Form.Control value={searchString} onChange={e => setSearchString(e.target.value)} onKeyDown={e => {
             if (e.key === 'Enter') {
-              refreshSearchResults();
+              searchParams.set("search", searchString);
+              setSearchParams(searchParams);
             }
           }}/>
         </div>
