@@ -5,7 +5,7 @@ import { apiAccountLogout } from "./dao";
 function AccountButton({loggedIn}: {loggedIn: boolean}) {
   const navigate = useNavigate();
   async function logout() {
-    await apiAccountLogout().then(() => navigate('/Home'));
+    await apiAccountLogout().then(() => { navigate('/Home'); window.location.reload(); });
   }
 
   return (
