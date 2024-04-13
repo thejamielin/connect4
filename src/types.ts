@@ -18,5 +18,8 @@ export interface BeginnerUser {
 }
 
 export interface UserStats {
-  // TODO: Add stat fields
+  wins: number;
+  losses: number;
+  ties: number;
+  gameIDs: string[];
 }

@@ -205,6 +205,8 @@ function Profile({
               </Link>
             ))}
           </ul>
+          <h2>Stats</h2>
+          <div>Wins: {userData.stats.wins} Losses: {userData.stats.losses} Ties: {userData.stats.ties}</div>
         </>
       )}
     </div>
