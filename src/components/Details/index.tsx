@@ -3,6 +3,7 @@ import Nav from "../../Nav";
 import { PictureInfo, apiGetCurrentSessionUser, apiPictureId, apiSetUser } from "../../dao";
 import { useNavigate, useParams } from "react-router";
 import { Button } from "react-bootstrap";
+import { Link } from "react-router-dom";
 
 function Details() {
   const { imageID } = useParams();
@@ -72,6 +73,7 @@ function Details() {
         <div>
           <SetPfpButton/>
         </div>
+        <Link to={entryData.pageURL} style={{fontSize: 20}}>{entryData.pageURL}</Link>
       </div>
     </div>
   );

@@ -92,6 +92,7 @@ export interface PictureInfo {
   user: string;
   tags: string;
   likes: string[];
+  pageURL: string;
 }
 
 export async function apiPictureSearch(
