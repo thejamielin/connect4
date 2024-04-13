@@ -22,6 +22,7 @@ const ACCOUNT_CHECKSESSION = `${API_BASE}/account/checkSession`;
 const ACCOUNT_LOGOUT = `${API_BASE}/account/logout`;
 const PICTURES_SEARCH = `${API_BASE}/pictures/search`;
 const PICTURES_ID = `${API_BASE}/pictures`;
+const PICTURES_LIKE = `${API_BASE}/pictures/like`;
 const USER = `${API_BASE}/user`;
 const GAME = `${API_BASE}/game`;
 const ACCOUNT_GETUSERDATA = `${API_BASE}/account`;
@@ -107,6 +108,14 @@ export async function apiPictureSearch(
 export async function apiPictureId(imageID: string): Promise<PictureInfo> {
   const response = await axios.get(`${PICTURES_ID}/${imageID}`);
   return response.data;
+}
+
+export async function apiPictureLike(imageID: string) {
+  await axios.put(`${PICTURES_LIKE}/${imageID}`, { token: getSessionToken() }).catch(() => 0);
+}
+
+export async function apiPictureUnlike(imageID: string) {
+  await axios.delete(`${PICTURES_LIKE}/${imageID}`, { headers: { Authorization: getSessionToken() } }).catch(() => 0);
 }
 
 export async function apiSetUser(
