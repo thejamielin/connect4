@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
 import { GameResult, RegularUser, User } from "../../types";
 import { apiGamesSearch } from "../../dao";
 

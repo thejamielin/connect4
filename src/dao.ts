@@ -18,7 +18,6 @@ const API_BASE = process.env.REACT_APP_API_BASE;
 const GAMES_SEARCH = `${API_BASE}/games/search`;
 const ACCOUNT_LOGIN = `${API_BASE}/account/login`;
 const ACCOUNT_REGISTER = `${API_BASE}/account/register`;
-const ACCOUNT_CHECKSESSION = `${API_BASE}/account/checkSession`;
 const ACCOUNT_LOGOUT = `${API_BASE}/account/logout`;
 const PICTURES_SEARCH = `${API_BASE}/pictures/search`;
 const PICTURES_ID = `${API_BASE}/pictures`;
@@ -75,13 +74,8 @@ export async function apiAccountRegister(
   return response.data.token;
 }
 
-export async function apiAccountCheckSession(token: string) {
-  const response = await axios.post(ACCOUNT_CHECKSESSION, { token: token });
-  return response.data.isValidSession;
-}
-
 export async function apiAccountLogout() {
-  await axios.post(ACCOUNT_LOGOUT, { token: getSessionToken() });
+  await axios.post(ACCOUNT_LOGOUT, {}, { headers: { Authorization: getSessionToken() } });
 }
 
 export interface PictureInfo {
@@ -111,7 +105,7 @@ export async function apiPictureId(imageID: string): Promise<PictureInfo> {
 }
 
 export async function apiPictureLike(imageID: string) {
-  await axios.put(`${PICTURES_LIKE}/${imageID}`, { token: getSessionToken() }).catch(() => 0);
+  await axios.put(`${PICTURES_LIKE}/${imageID}`, {}, { headers: { Authorization: getSessionToken() } }).catch(() => 0);
 }
 
 export async function apiPictureUnlike(imageID: string) {
@@ -124,28 +118,24 @@ export async function apiSetUser(
     | Partial<Pick<BeginnerUser, "email">>
 ): Promise<boolean> {
   const response = await axios.put(USER, {
-    body: { token: getSessionToken(), editedFields: user },
-  });
+    body: { editedFields: user },
+  }, { headers: { Authorization: getSessionToken() } });
   return response.data.success;
 }
 
 export async function apiCreateGame(): Promise<string> {
-  const response = await axios.post(GAME, { token: getSessionToken() });
+  const response = await axios.post(GAME, {}, { headers: { Authorization: getSessionToken() } });
   return response.data.gameID;
 }
 
 export async function apiGetUser(username: string) {
-  const response = await axios.post(`${USER}/${username}`, {
-    token: getSessionToken(),
-  });
+  const response = await axios.get(`${USER}/${username}`, { headers: { Authorization: getSessionToken() } });
   return response.data;
 }
 
 export async function apiGetCurrentSessionUser(): Promise<User | false> {
   return await axios
-    .post(ACCOUNT_GETUSERDATA, {
-      token: getSessionToken(),
-    })
+    .get(ACCOUNT_GETUSERDATA, { headers: { Authorization: getSessionToken() }})
     .then((response) => {
       return response.data;
     })
