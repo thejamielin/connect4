@@ -3,12 +3,9 @@ import Nav from "../../Nav";
 import { useNavigate } from "react-router";
 import axios from "axios";
 import {
-  apiAccountCheckSession,
   apiAccountLogin,
   apiGetCurrentSessionUser,
-  cacheSessionToken,
-  deleteSessionToken,
-  getSessionToken,
+  cacheSessionToken
 } from "../../dao";
 import Inputs from "./Inputs";
 

@@ -1,5 +1,5 @@
 import Nav from "../../Nav";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import GameList from "./GameList";
 import { Button, Col, Container, Row, Stack } from "react-bootstrap";
 import { useEffect, useState } from "react";
