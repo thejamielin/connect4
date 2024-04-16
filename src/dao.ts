@@ -1,5 +1,6 @@
 import axios from "axios";
-import { User, BeginnerUser, GameResult, RegularUser } from "./types";
+import { User, BeginnerUser, RegularUser } from "./types";
+import { GameResult } from "./components/Game/gameTypes";
 
 const COOKIE_TOKEN_NAME = "token";
 export function cacheSessionToken(token: string) {

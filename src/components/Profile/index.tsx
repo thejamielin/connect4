@@ -51,9 +51,9 @@ export function OtherProfile() {
       const isChill = userData.username === username;
       if (isChill) {
         navigate("/profile");
-        return
+        return;
       }
-      userData.role === "beginner" && navigate("/home")
+      userData.role === "beginner" && navigate("/home");
     }
   }, [userData, username]);
 
@@ -153,6 +153,7 @@ function Profile({
               type="text"
               id="email-field"
               title="Email field"
+              placeholder="Email"
               value={userData.email}
               onChange={(e) =>
                 setUserData({ ...userData, email: e.target.value })
@@ -180,8 +181,10 @@ function Profile({
 
   return (
     <div>
-      <Nav loggedIn={!!currentUserData} 
-           isBeginner={currentUserData && currentUserData.role === "beginner"} />
+      <Nav
+        loggedIn={!!currentUserData}
+        isBeginner={currentUserData && currentUserData.role === "beginner"}
+      />
       <h1>Profile</h1>
       {userData.role === "regular" && profilePic && (
         <Link to={`/details/${userData.pfp}`}>
@@ -202,6 +205,8 @@ function Profile({
               </Link>
             ))}
           </ul>
+          <h2>Stats</h2>
+          <div>Wins: {userData.stats.wins} Losses: {userData.stats.losses} Ties: {userData.stats.ties}</div>
         </>
       )}
     </div>

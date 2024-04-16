@@ -190,7 +190,6 @@ export default function Game() {
     console.log(lastMessage.data)
     const message: ServerMessage = JSON.parse(lastMessage.data);
     if (message.type === 'state') {
-      console.log('setting it !')
       setGameState(message.gameState);
     } else if (message.type === 'move') {
       setGameState(message.gameState);
@@ -213,8 +212,6 @@ export default function Game() {
         return;
       }
       setGameState({...gameState, readyIDs: [...gameState.readyIDs, message.playerID]});
-    } else if (message.type === 'gameover') {
-      // alert('game over man')
     }
   }, [lastMessage]);
 
@@ -268,6 +265,12 @@ export default function Game() {
           gameState={gameState}
           onMove={column => send({ type: 'move', column })}
         />
+      )}
+      {gameState.phase === 'over' && (
+        <div>
+          <h1>It's Jover</h1>
+          {gameState.result.winnerID ? <h2>{gameState.result.winnerID} won!</h2> : <h2>No one won. Tie.</h2>}
+        </div>
       )}
     </div>
   );

@@ -1,21 +1,25 @@
 export interface InputField {
-  name : string,
-  set : (input : any) => void, 
-  value : any,
-  type? : string
+  name: string;
+  set: (input: any) => void;
+  value: any;
+  type?: string;
 }
 
-function Inputs({fields} : {fields : InputField[]}) {
+function Inputs({ fields }: { fields: InputField[] }) {
   return (
     <div>
-      <div style={{display: 'flex', flexDirection: 'column'}}>
-        {
-          fields.map((field : InputField, i) => (
-            <label key={i}>{field.name} <input type={field.type}
-                                       value={field.value}
-                                       onChange={e => field.set(e.target.value)}/></label>
-          ))
-        }
+      <div style={{ display: "flex", flexDirection: "column" }}>
+        {fields.map((field: InputField, i) => (
+          <label key={i}>
+            {field.name}{" "}
+            <input
+              type={field.type}
+              placeholder={field.name}
+              value={field.value}
+              onChange={(e) => field.set(e.target.value)}
+            />
+          </label>
+        ))}
       </div>
     </div>
   );

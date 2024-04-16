@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
-import { GameResult, RegularUser, User } from "../../types";
+import axios from "axios";
+import { RegularUser, User } from "../../types";
 import { apiGamesSearch } from "../../dao";
+import { GameResult } from "../Game/gameTypes";
 
 export interface GameSearchParameters {
   count: number;
@@ -35,15 +37,15 @@ export default GameList;
 
 function GameListEntry({ game }: { game: GameResult }) {
   function winIcon(playerName: string) {
-    return <span style={{width: '20pt', display: 'inline-block'}}>{game.winner === playerName && <i className="bi bi-trophy"></i>}</span>;
+    return <span style={{width: '20pt', display: 'inline-block'}}>{game.winnerID === playerName && <i className="bi bi-trophy"></i>}</span>;
   }
   return (
     <div style={{borderStyle: 'solid', margin: '2%'}}>
       <div style={{fontSize: 20, backgroundColor: 'lightblue', width: '100%', justifyContent: 'center', display: 'flex'}}>
         <div>
-          <a href={`/#/profile/${game.player1}`}> {winIcon(game.player1)} {game.player1} </a>
+          <a href={`/#/profile/${game.playerIDs[0]}`}> {winIcon(game.playerIDs[0])} {game.playerIDs[0]} </a>
           <span style={{fontSize: 16}}>vs</span>
-          <a href={`/#/profile/${game.player2}`}> {game.player2}</a> {winIcon(game.player2)}
+          <a href={`/#/profile/${game.playerIDs[1]}`}> {game.playerIDs[1]}</a> {winIcon(game.playerIDs[1])}
         </div>
       </div>
     </div>
