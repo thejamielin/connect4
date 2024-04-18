@@ -8,12 +8,16 @@ import {
   cacheSessionToken
 } from "../../dao";
 import Inputs from "./Inputs";
+import { Button } from "react-bootstrap";
+import TempMessage from "../Util/TempMessage";
 
 function Login() {
   const navigate = useNavigate();
   const [username, setUsername] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [loggedIn, setLoggedIn] = useState<boolean>();
+  const [loginFail, setLoginFail] = useState<boolean>(false);
+
 
   useEffect(() => {
     apiGetCurrentSessionUser().then((data) => {
@@ -28,17 +32,17 @@ function Login() {
   }, [loggedIn]);
 
   if (loggedIn === undefined) {
-    return <div>Loading</div>;
+    return <TempMessage text="Loading..." />;
   }
 
   const FIELDS = [
     {
-      name: "username",
+      name: "Username",
       set: setUsername,
       value: username,
     },
     {
-      name: "password",
+      name: "Password",
       set: setPassword,
       value: password,
       type: "password"
@@ -54,18 +58,21 @@ function Login() {
         navigate("/home");
       })
       .catch(() => {
-        // TODO: handle login fail
+        setLoginFail(true)
       });
   }
 
   return (
     <div>
       <Nav loggedIn={loggedIn} isBeginner={false}/>
-      <h1>Login</h1>
-      <div style={{ display: "flex", flexDirection: "column" }}>
+      <div className="login-page">
+        <h1>Login</h1>
         <Inputs fields={FIELDS} />
-        <button onClick={login}>Log in</button>
-        <button onClick={() => navigate("/register")}>Go Register</button>
+        {loginFail && <p className="error-text">Login Failed</p>}
+        <div>
+          <Button size="lg" style={{marginRight: "10px"}} onClick={login}>Log in</Button>
+          <Button size="lg" onClick={() => navigate("/register")}>Go Register</Button>
+        </div>
       </div>
     </div>
   );

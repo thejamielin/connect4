@@ -1,0 +1,19 @@
+.field label {
+  width: 200px;  
+  padding-bottom: 10px;
+}
+
+.error-text {
+  color:red
+}
+
+.login-page {
+  font-size: 20px;
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+}
+
+input[type=checkbox] {
+  transform: scale(1.5);
+}
