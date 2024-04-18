@@ -1,0 +1,38 @@
+.entry {
+  border-style: solid;
+  margin: 1%;
+  height: 20vh;
+  display: flex;
+  width: 40em;
+  cursor: pointer
+} 
+
+.text-style {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+}
+
+.img {
+  object-fit: fill;
+  height: 100%;
+}
+
+.search-page {
+  margin-left: 5%;
+  margin-right: 5%;
+  position: relative
+}
+
+.entry-container {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+}
+
+.heart {
+  border: none;
+  background: none;
+  cursor: pointer;
+  width: 101%;
+}

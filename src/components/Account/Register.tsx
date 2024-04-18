@@ -7,6 +7,8 @@ import {
   apiGetCurrentSessionUser,
   cacheSessionToken,
 } from "../../dao";
+import { Button } from "react-bootstrap";
+import TempMessage from "../Util/TempMessage";
 
 export default function Register() {
   const navigate = useNavigate();
@@ -24,28 +26,28 @@ export default function Register() {
   }, []);
 
   if (loggedIn === undefined) {
-    return <div>Loading</div>;
+    return <TempMessage text="Loading..." />;
   }
 
   const FIELDS = [
     {
-      name: "username",
+      name: "Username",
       set: setUsername,
       value: username,
     },
     {
-      name: "email",
+      name: "Email",
       set: setEmail,
       value: email,
     },
     {
-      name: "password",
+      name: "Password",
       set: setPassword,
       value: password,
       type: "password",
     },
     {
-      name: "beginner",
+      name: "Are you a beginner? ",
       set: setIsBeginner,
       value: isBeginner,
       type: "checkbox",
@@ -71,12 +73,14 @@ export default function Register() {
   return (
     <div>
       <Nav loggedIn={false} isBeginner={false}/>
-      <h1>Register</h1>
-      <div style={{ display: "flex", flexDirection: "column" }}>
+      <div className="login-page">
+        <h1>Register</h1>
         <Inputs fields={FIELDS} />
-        {userExists && <p style={{ color: "red" }}>User Already Exists!</p>}
-        <button onClick={register}>Register</button>
-        <button onClick={() => navigate("/login")}>Go Login</button>
+        {userExists && <p className="error-text">User Already Exists!</p>}
+        <div>
+          <Button size='lg' style={{marginRight: "10px"}} onClick={register}>Register</Button>
+          <Button size='lg' onClick={() => navigate("/login")}>Go Login</Button>
+        </div>
       </div>
     </div>
   );

@@ -7,6 +7,9 @@ import { useParams } from "react-router";
 import { ClientRequest, GameData, GameCreationData, OngoingGameData, ServerMessage } from "./gameTypes";
 import { Button } from "react-bootstrap";
 import { User } from "../../types";
+import "./index.css"
+import { Link } from "react-router-dom";
+import TempMessage from "../Util/TempMessage";
 
 interface Connect4RendererProps {
   board: Connect4Board;
@@ -119,11 +122,25 @@ function Connect4Renderer({board, colors, lastMove, onClickSlot}: Connect4Render
 }
 
 function GameCreationPanel({ gameState, onReady }: { gameState: GameCreationData, onReady: () => void }) {
+  const url = window.location.href
+  const [copyText, setCopyText] = useState("Copy")
+
   return (
-    <div>
-      <h1>Invite Friends with This Link: {'<nothing, bc f u>'}</h1>
-      <h4>Players: {JSON.stringify(gameState.connectedIDs)}</h4>
-      <h4>Ready: {JSON.stringify(gameState.readyIDs)}</h4>
+    <div className="page">
+      <h1>Invite Friends with This Link:</h1>
+      <div style={{fontSize: "20px"}}>
+        <Link to={url}>{url}</Link>
+        <Button onClick={() => {navigator.clipboard.writeText(url); setCopyText("Copied!")}}
+                style={{marginLeft: "10px"}}>
+                  {copyText}
+        </Button>
+      </div>
+      Players in room: 
+      {gameState.connectedIDs.map((name) => {
+        return(
+          <p>{name} - {gameState.readyIDs.includes(name) ? "Ready" : "Waiting"}</p>
+        )
+      })}
       <Button onClick={onReady}>Ready!</Button>
     </div>
   )
@@ -146,11 +163,11 @@ function GameplayPanel({ playerIndex, gameState, onMove }: GameplayPanelProps) {
 
   return (
     <div>
-      <h1>Play Game!</h1>
+      <h2 style={{padding: "20px"}}>
+        Play Game!
+      </h2>
       <div style={{display: 'flex', justifyContent: 'center'}}>
-        <div style={{height: '100%', width: '30%'}}>
-          <div>Connected: {JSON.stringify(gameState.connectedIDs)}</div>
-          <div>Players: {JSON.stringify(gameState.playerIDs)}</div>
+        <div style={{height: '100%', width: '40%'}}>
           <Connect4Renderer
             board={gameState.board}
             lastMove={gameState.board.lastMove}
@@ -229,20 +246,14 @@ export default function Game() {
     return () => clearTimeout(timeout);
   }, [readyState]);
 
-  if (loggedIn === undefined || username === undefined || connectionSuccess === undefined) {
-    return <div>Loading</div>;
+  if (loggedIn === undefined || username === undefined || connectionSuccess === undefined || gameState === undefined) {
+    return <TempMessage text="Loading..."/>;
   }
 
   if (connectionSuccess === false) {
     return (
-      <div>
-        Connection failed! Does this game exist?
-      </div>
+      <TempMessage text="Connection failed! Does this game exist?"/>
     );
-  }
-
-  if (gameState === undefined) {
-    return <div>Loading (for game data)</div>
   }
 
   // TODO: perhaps send an api request to ask if the game exists

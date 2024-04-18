@@ -1,0 +1,18 @@
+.game-box {
+  border-style: solid;
+  padding: 10px;
+  height: auto;
+  margin-top: 10px
+}
+
+.result-box {
+  border-style: solid;
+}
+
+.result-entry {
+  font-size: 20px;
+  background-color: lightblue;
+  width: 100%;
+  justify-content: center;
+  display: flex;
+}

@@ -12,6 +12,8 @@ import { useNavigate } from "react-router";
 import { useSearchParams } from "react-router-dom";
 import { BsHeartFill } from "react-icons/bs";
 import { User } from "../../types";
+import "./index.css"
+import TempMessage from "../Util/TempMessage";
 
 function SearchEntry({
   pictureInfo,
@@ -55,7 +57,7 @@ function SearchEntry({
           >
             <button
               onClick={(e) => onLike(e)}
-              style={{ border: "none", background: "none", cursor: "pointer" }}
+              className="heart"
             >
               <BsHeartFill color={liked ? "red" : "gray"} size={24} />
             </button>
@@ -67,28 +69,22 @@ function SearchEntry({
 
   return (
     <div
-      className="unselectable justify-content-between"
+      className="unselectable justify-content-between entry"
       style={{
-        borderStyle: "solid",
-        margin: "1%",
-        height: "20vh",
-        display: "flex",
-        width: "40em",
-        cursor: "pointer",
         ...(hoveringOver ? { backgroundColor: "lightgray" } : {}),
       }}
       onMouseEnter={() => setHoveringOver(true)}
       onMouseLeave={() => setHoveringOver(false)}
       onClick={() => navigate(`/details/${pictureInfo.id}`)}
     >
-      <div style={{ display: "flex", alignItems: "center", padding: "2%" }}>
+      <div className="text-style">
         Image #{pictureInfo.id}
       </div>
       <img
         src={pictureInfo.previewURL}
-        style={{ objectFit: "fill", height: "100%" }}
+        className="img"
       />
-      <div style={{ display: "flex", alignItems: "center", padding: "2%" }}>
+      <div className="text-style">
         {likeCount}
         <LikeButton />
       </div>
@@ -116,15 +112,13 @@ function Search() {
   }, [searchParams]);
 
   if (loggedIn === undefined || userData === undefined) {
-    return <div>Loading</div>;
+    return <TempMessage text="Loading..."/>
   }
 
   return (
     <div>
       <Nav loggedIn={loggedIn} isBeginner={false} />
-      <div
-        style={{ marginLeft: "5%", marginRight: "5%", position: "relative" }}
-      >
+      <div className="search-page">
         <div style={{ position: "sticky", top: 0 }}>
           <h1>Search Profile Pictures</h1>
           <Form.Control
@@ -139,13 +133,7 @@ function Search() {
             }}
           />
         </div>
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            flexDirection: "column",
-          }}
-        >
+        <div className="entry-container">
           {imageEntries.slice(10).map((imageEntry, i) => (
             <SearchEntry pictureInfo={imageEntry} userData={userData} key={i} />
           ))}

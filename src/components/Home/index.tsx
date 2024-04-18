@@ -5,6 +5,7 @@ import { Button, Col, Container, Row, Stack } from "react-bootstrap";
 import { useEffect, useState } from "react";
 import { apiCreateGame, apiGetCurrentSessionUser } from "../../dao";
 import { User } from "../../types";
+import TempMessage from "../Util/TempMessage";
 
 function StartGamePanel({
   isBeginner,
@@ -24,12 +25,12 @@ function StartGamePanel({
   }
 
   return (
-    <div style={{ borderStyle: "solid", padding: "10px" }}>
+    <div className="game-box">
       <h3>Play</h3>
       <Stack gap={2}>
         {!isBeginner ? (
           <>
-            <Button>Random Match</Button>
+            <Button>Bot Game?</Button>
             <Button onClick={onPlayWithFriend}>Play with Friend</Button>
           </>
         ) : (
@@ -50,7 +51,7 @@ function Home() {
   }, []);
 
   if (userData === undefined) {
-    return <div>Loading</div>;
+    return <TempMessage text="Loading..."/>
   }
 
   const [loggedIn, isBeginner] = [
@@ -64,11 +65,11 @@ function Home() {
       <div>
         <Container style={{ marginLeft: "5%", marginRight: "5%" }}>
           <h1>Home</h1>
-          <Row>
-            <Col className="col-8">
+          <Row sm={12}>
+            <Col lg={8} md={12}>
               <StartGamePanel loggedIn={loggedIn} isBeginner={isBeginner} />
             </Col>
-            <Col>
+            <Col lg={4} md={12}>
               {userData && userData.role === "beginner" ? (
                 <p>
                   To play with other users and see their stats, create a

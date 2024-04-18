@@ -4,6 +4,8 @@ import { PictureInfo, apiGetCurrentSessionUser, apiPictureId, apiSetUser } from 
 import { useNavigate, useParams } from "react-router";
 import { Button } from "react-bootstrap";
 import { Link } from "react-router-dom";
+import "./index.css"
+import TempMessage from "../Util/TempMessage";
 
 function Details() {
   const { imageID } = useParams();
@@ -32,22 +34,11 @@ function Details() {
   }, []);
 
   if (loggedIn === undefined || entryData === undefined) {
-    return <div>Loading</div>;
-  }
-
-  if (entryData === 'invalid') {
-    return (
-      <div>
-        <Nav loggedIn={loggedIn} isBeginner={false}/>
-        <div style={{marginLeft: '5%', marginRight: '5%'}}>
-          <h1>This image does not exist.</h1>
-        </div>
-      </div>
-    );
+    return <TempMessage text="Loading..."/>;
   }
 
   const setProfilePicture = () => {
-    apiSetUser({ pfp: entryData.id + '' }).then(setPfpSet);
+    entryData !== 'invalid' && apiSetUser({ pfp: entryData.id + '' }).then(setPfpSet);
   }
 
   function SetPfpButton() {
@@ -61,19 +52,39 @@ function Details() {
   }
 
   return (
-    <div>
+    <div style={{overflow: "hidden"}}>
       <Nav loggedIn={loggedIn} isBeginner={false}/>
-      <div style={{marginLeft: '5%', marginRight: '5%'}}>
-        <h1>Details</h1>
-        <div>
-          <h2>Image #{entryData.id}</h2>
-          <h4>Artist: {entryData.user} &nbsp; Views: {entryData.views} &nbsp; Tags: {entryData.tags}</h4>
-          <img src={entryData.webformatURL}/>
+      <div className="details-page">
+        {entryData === 'invalid' ?
+        <>
+          <Button onClick={() => navigate('/search')}>
+            {"< Search"}
+          </Button>
+          <TempMessage text="This image does not exist"/>
+        </>
+        :
+        <div style={{display: "flex"}}>
+          <div className="img-container">
+            <Button onClick={() => navigate('/search')}>
+              {"< Search"}
+            </Button>
+            <div>
+              <img className="img" src={entryData.webformatURL} />
+            </div>
+          </div>
+          <div>
+            <h1>Details</h1>
+            <div>
+              <h2>Image #{entryData.id}</h2>
+              <h4>Artist: {entryData.user} &nbsp; Views: {entryData.views} &nbsp; Tags: {entryData.tags}</h4>
+            </div>
+            <Link to={entryData.pageURL}>{entryData.pageURL}</Link>
+            <div style={{paddingTop: "10px"}}>
+              <SetPfpButton/>
+            </div>
+          </div>
         </div>
-        <div>
-          <SetPfpButton/>
-        </div>
-        <Link to={entryData.pageURL} style={{fontSize: 20}}>{entryData.pageURL}</Link>
+        }
       </div>
     </div>
   );

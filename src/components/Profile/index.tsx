@@ -8,9 +8,12 @@ import {
   apiSetUser,
 } from "../../dao";
 import { useNavigate, useParams } from "react-router";
-import { Button } from "react-bootstrap";
+import { Button, Col, Container, Row } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import { User } from "../../types";
+import "./index.css"
+import GameList from "../Home/GameList";
+import TempMessage from "../Util/TempMessage";
 
 export function SelfProfile() {
   const navigate = useNavigate();
@@ -23,12 +26,12 @@ export function SelfProfile() {
   }, []);
 
   if (userData === undefined) {
-    return <div>Loading</div>;
+    return <TempMessage text="Loading..."/>
   }
 
   if (!userData) {
     navigate("/login");
-    return <div>Must be logged in. Redirecting...</div>;
+    return <TempMessage text="Must be logged in. Redirecting..."/>
   }
 
   return <Profile username={userData.username} isChill={true} />;
@@ -58,7 +61,7 @@ export function OtherProfile() {
   }, [userData, username]);
 
   if (!username) {
-    return <div>Loading</div>;
+    return <TempMessage text="Loading..."/>;
   }
 
   return <Profile username={username} isChill={false} />;
@@ -81,14 +84,13 @@ function Profile({
   useEffect(() => {
     apiGetCurrentSessionUser().then((data) => {
       setCurrentUserData(data);
+      data 
+      && data.role === "regular" 
+      && setAmIFollowing(data.following.includes(username));
     });
   }, []);
 
   useEffect(() => {
-    if (currentUserData) {
-      currentUserData.role === "regular" &&
-        setAmIFollowing(currentUserData.following.includes(username));
-    }
     apiGetUser(username)
       .then((userData) => {
         setUserData(userData);
@@ -104,13 +106,13 @@ function Profile({
   }, [username]);
 
   if (currentUserData === undefined || userData === undefined) {
-    return <div>Loading</div>;
+    return <TempMessage text="Loading..."/>;
   }
   if (!userData) {
     return (
       <div>
-        User {username} does not exist!
-        <Button onClick={() => navigate("/Home")}>Go Home</Button>
+        <TempMessage text="User does not exist!"/>
+        <Button style={{marginLeft: "20px"}} onClick={() => navigate("/Home")}>Go Home</Button>
       </div>
     );
   }
@@ -144,24 +146,27 @@ function Profile({
 
   const chillUI = () => {
     return (
-      <div>
-        <p>Username: {username}</p>
+      <div style={{display: "flex"}}>
         <form>
-          <label>
+          <label htmlFor="email-field">
             Email:
-            <input
-              type="text"
-              id="email-field"
-              title="Email field"
-              placeholder="Email"
-              value={userData.email}
-              onChange={(e) =>
-                setUserData({ ...userData, email: e.target.value })
-              }
-            />
           </label>
+          <input
+            type="text"
+            id="email-field"
+            title="Email field"
+            placeholder="Email"
+            value={userData.email}
+            style={{marginLeft: "10px", width: "250px"}}
+            onChange={(e) =>
+              setUserData({ ...userData, email: e.target.value })
+            }
+          />
         </form>
-        <Button onClick={handleEmailChange}>Change Email</Button>
+        <Button style={{marginLeft: "10px"}} 
+                onClick={handleEmailChange}>
+                  Change Email
+        </Button>
       </div>
     );
   };
@@ -169,7 +174,6 @@ function Profile({
   const notChillUI = () => {
     return (
       <div>
-        <p>Username: {username}</p>
         {currentUserData && (
           <Button onClick={handleFollow}>
             {amIFollowing ? "Unfollow" : "Follow"}
@@ -185,30 +189,42 @@ function Profile({
         loggedIn={!!currentUserData}
         isBeginner={currentUserData && currentUserData.role === "beginner"}
       />
-      <h1>Profile</h1>
-      {userData.role === "regular" && profilePic && (
-        <Link to={`/details/${userData.pfp}`}>
-          <img
-            src={profilePic.previewURL}
-            style={{ objectFit: "fill", height: "100%" }}
-          />
-        </Link>
-      )}
-      {isChill ? chillUI() : notChillUI()}
-      {userData.role === "regular" && (
-        <>
-          <h2>Followers</h2>
-          <ul>
-            {userData.following.map((follower: string) => (
-              <Link to={`/profile/${follower}`}>
-                <li key={follower}>{follower}</li>
-              </Link>
-            ))}
-          </ul>
-          <h2>Stats</h2>
-          <div>Wins: {userData.stats.wins} Losses: {userData.stats.losses} Ties: {userData.stats.ties}</div>
-        </>
-      )}
+      <Container className="profile">
+        <Row lg={2} md={1}>
+          <Col>
+            <div style={{display: "flex"}}>
+              {userData.role === "regular" && profilePic && (
+                <Link to={`/details/${userData.pfp}`}>
+                  <img className="pfp" src={profilePic.previewURL} />
+                </Link>
+              )}
+              <h1>{username}'s Profile</h1>
+            </div>
+            {isChill ? chillUI() : notChillUI()}
+            {userData.role === "regular" &&
+              <div className="box">
+                <h2>Following</h2>
+                <ul>
+                  {userData.following.length !== 0 ?
+                  userData.following.map((follower: string) => (
+                    <Link to={`/profile/${follower}`}>
+                      <li key={follower}>{follower}</li>
+                    </Link>
+                  ))
+                  :
+                  <p>Not following anyone {":("}</p>}
+                </ul>
+              </div>
+            }
+          </Col>
+          {userData.role === "regular" && (
+            <Col>
+              <GameList userData={userData}/>
+              <div>Wins: {userData.stats.wins} Losses: {userData.stats.losses} Ties: {userData.stats.ties}</div>
+            </Col>
+          )}
+        </Row>
+      </Container>
     </div>
   );
 }
