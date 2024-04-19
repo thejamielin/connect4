@@ -3,7 +3,7 @@ import Nav from "../../Nav";
 import { apiGetCurrentSessionUser, gameWebSocketURL } from "../../dao";
 import { Connect4Board } from "./connect4";
 import useWebSocket, { ReadyState } from "react-use-websocket";
-import { useParams } from "react-router";
+import { useNavigate, useParams } from "react-router";
 import { ClientRequest, GameData, GameCreationData, OngoingGameData, ServerMessage } from "./gameTypes";
 import { Button } from "react-bootstrap";
 import { User } from "../../types";
@@ -181,13 +181,14 @@ function GameplayPanel({ playerIndex, gameState, onMove }: GameplayPanelProps) {
 }
 
 export default function Game() {
-  const [loggedIn, setLoggedIn] = useState<boolean>();
-  const [username, setUsername] = useState<string>();
+  const [userData, setUserData] = useState<User | false>();
   const { gameID } = useParams();
   const [connectionSuccess, setConnectionSuccess] = useState<boolean>();
   const didUnmount = useRef(false);
   const { sendMessage, lastMessage, readyState } = useWebSocket(gameID ? gameWebSocketURL(gameID) : null, { shouldReconnect: () => didUnmount.current === false});
   const [gameState, setGameState] = useState<GameData>();
+
+  const navigate = useNavigate()
 
   useEffect(() => {
     return () => { didUnmount.current = true };
@@ -195,8 +196,7 @@ export default function Game() {
 
   useEffect(() => {
     apiGetCurrentSessionUser().then((data: User | false) => {
-      setLoggedIn(!!data);
-      data && setUsername(data.username);
+      setUserData(data);
     });
   }, []);
 
@@ -246,13 +246,33 @@ export default function Game() {
     return () => clearTimeout(timeout);
   }, [readyState]);
 
-  if (loggedIn === undefined || username === undefined || connectionSuccess === undefined || gameState === undefined) {
+
+  if (!userData || (userData.role === "beginner" && !(gameState && gameState.connectedIDs.includes("bot")))) {
+    return (
+      <div>
+        {userData === undefined ?
+          <TempMessage text="Loading..."/>
+          :
+          <div>
+            <Nav loggedIn={!!userData} isBeginner={true}/>
+            <TempMessage text="Must be logged in or non-beginner to play!"/>
+            <Button style={{margin: "10px", fontSize: "30px"}} onClick={() => navigate("/home")}>Go Home</Button>
+          </div>
+        }
+      </div>
+    );
+  }
+
+  if (connectionSuccess === undefined || gameState === undefined) {
     return <TempMessage text="Loading..."/>;
   }
 
   if (connectionSuccess === false) {
     return (
-      <TempMessage text="Connection failed! Does this game exist?"/>
+      <div>
+        <Nav loggedIn={!!userData} isBeginner={true}/>
+        <TempMessage text="Connection failed! Does this game exist?"/>
+      </div>
     );
   }
 
@@ -267,12 +287,12 @@ export default function Game() {
   // TODO: Change isBeginner to check if actually a beginner here
   return (
     <div>
-      <Nav loggedIn={loggedIn} isBeginner={false}/>
+      <Nav loggedIn={!!userData} isBeginner={false}/>
       {readyState !== ReadyState.OPEN && <div>Connecting...</div>}
       {gameState.phase === 'creation' && <GameCreationPanel gameState={gameState} onReady={() => send({ type: 'ready' })}/>}
       {gameState.phase === 'ongoing' && (
         <GameplayPanel
-          playerIndex={gameState.playerIDs.findIndex(playerID => playerID === username)}
+          playerIndex={gameState.playerIDs.findIndex(playerID => playerID === userData.username)}
           gameState={gameState}
           onMove={column => send({ type: 'move', column })}
         />
