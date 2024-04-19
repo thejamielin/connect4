@@ -8,6 +8,7 @@ import { ClientRequest, GameData, GameCreationData, OngoingGameData, ServerMessa
 import { Button } from "react-bootstrap";
 import { User } from "../../types";
 import "./index.css";
+import "../../style.css";
 import { Link } from "react-router-dom";
 import TempMessage from "../Util/TempMessage";
 
@@ -383,6 +384,7 @@ export default function Game() {
           ) : (
             <h2>No one won. Tie.</h2>
           )}
+          <Button onClick={() => {navigate("/game/" + gameState.rematchId)}}>Rematch?</Button>
         </div>
       )}
     </div>
