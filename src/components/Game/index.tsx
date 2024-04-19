@@ -221,6 +221,11 @@ function GameplayPanel({
   onMove,
   username,
 }: GameplayPanelProps) {
+  const [colors, setColors] = useState<string[]>([]);
+
+  useEffect(() => {
+    setColors(getListOfColors());
+  }, []);
   function onClickSlot(col: number, row: number) {
     console.log("players", playerIndex, gameState.board.playerTurn);
     console.log(Connect4Board.canMove(gameState.board, col));
@@ -258,7 +263,7 @@ function GameplayPanel({
           <Connect4Renderer
             board={gameState.board}
             lastMove={gameState.board.lastMove}
-            colors={getListOfColors()}
+            colors={colors}
             onClickSlot={onClickSlot}
           />
         </div>
