@@ -24,13 +24,17 @@ function StartGamePanel({
     apiCreateGame().then((gameID) => navigate(`/game/${gameID}`));
   }
 
+  async function onPlayAgainstBot() {
+    apiCreateGame(true).then((gameID) => navigate(`/game/${gameID}`));
+  }
+
   return (
     <div className="game-box">
       <h3>Play</h3>
       <Stack gap={2}>
         {!isBeginner ? (
           <>
-            <Button>Bot Game?</Button>
+            <Button onClick={onPlayAgainstBot}>Bot Game?</Button>
             <Button onClick={onPlayWithFriend}>Play with Friend</Button>
           </>
         ) : (

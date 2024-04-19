@@ -124,8 +124,8 @@ export async function apiSetUser(
   return response.data.success;
 }
 
-export async function apiCreateGame(): Promise<string> {
-  const response = await axios.post(GAME, {}, { headers: { Authorization: getSessionToken() } });
+export async function apiCreateGame(botGame: boolean = false): Promise<string> {
+  const response = await axios.post(`${GAME}?againstBot=${botGame}`, {}, { headers: { Authorization: getSessionToken() } });
   return response.data.gameID;
 }
 
