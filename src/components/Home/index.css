@@ -7,6 +7,7 @@
 
 .result-box {
   border-style: solid;
+  width: 100%;
 }
 
 .result-entry {
@@ -15,4 +16,6 @@
   width: 100%;
   justify-content: center;
   display: flex;
+  white-space: nowrap;
+  overflow: hidden
 }
