@@ -25,6 +25,10 @@ function StartGamePanel({
   }
 
   async function onPlayAgainstBot() {
+    if (!loggedIn) {
+      navigate("/login");
+      return;
+    }
     apiCreateGame(true).then((gameID) => navigate(`/game/${gameID}`));
   }
 
