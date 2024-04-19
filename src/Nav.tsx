@@ -41,7 +41,9 @@ function Nav({
   return (
     <Navbar className="nav nav-tabs mt-2">
       <Link className="nav-link" to="/Home">
-        Home
+        <Navbar.Brand>
+          <img style={{ height: "30px" }} src="c4-icon.ico"></img> Connect4Fun
+        </Navbar.Brand>
       </Link>
       <Navbar.Collapse>
         <NavItem
