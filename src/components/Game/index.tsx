@@ -4,6 +4,7 @@ import { apiGetCurrentSessionUser, gameWebSocketURL } from "../../dao";
 import { Connect4Board } from "./connect4";
 import useWebSocket, { ReadyState } from "react-use-websocket";
 import { useNavigate, useParams } from "react-router";
+import Confetti from "react-confetti";
 import {
   ClientRequest,
   GameData,
@@ -17,6 +18,27 @@ import "./index.css";
 import "../../style.css";
 import { Link } from "react-router-dom";
 import TempMessage from "../Util/TempMessage";
+
+const MINIMUM_NUMBER_OF_PLAYERS = 2;
+
+function getListOfColors(numPlayers: number) {
+  const colors = [
+    "var(--c4-red)",
+    "var(--c4-yellow)",
+    "var(--c4-green)",
+    "var(--c4-purple)",
+  ];
+  if (numPlayers > colors.length) {
+    const newColorCount = numPlayers - colors.length;
+    for (let i = 0; i < newColorCount; i++) {
+      var randomColor = "#000000".replace(/0/g, function () {
+        return (~~(Math.random() * 16)).toString(16);
+      });
+      colors.push(randomColor);
+    }
+  }
+  return colors.slice(0, numPlayers);
+}
 
 interface Connect4RendererProps {
   board: Connect4Board;
@@ -213,6 +235,7 @@ interface GameplayPanelProps {
   gameState: OngoingGameData;
   onMove: (col: number) => void;
   username: string;
+  colors: string[];
 }
 
 function GameplayPanel({
@@ -220,12 +243,8 @@ function GameplayPanel({
   gameState,
   onMove,
   username,
+  colors,
 }: GameplayPanelProps) {
-  const [colors, setColors] = useState<string[]>([]);
-
-  useEffect(() => {
-    setColors(getListOfColors());
-  }, []);
   function onClickSlot(col: number, row: number) {
     if (
       playerIndex === gameState.board.playerTurn &&
@@ -233,24 +252,6 @@ function GameplayPanel({
     ) {
       onMove(col);
     }
-  }
-  function getListOfColors() {
-    const colors = [
-      "var(--c4-red)",
-      "var(--c4-yellow)",
-      "var(--c4-green)",
-      "var(--c4-purple)",
-    ];
-    if (gameState.playerIDs.length > colors.length) {
-      const newColorCount = gameState.playerIDs.length - colors.length;
-      for (let i = 0; i < newColorCount; i++) {
-        var randomColor = "#000000".replace(/0/g, function () {
-          return (~~(Math.random() * 16)).toString(16);
-        });
-        colors.push(randomColor);
-      }
-    }
-    return colors.slice(0, gameState.playerIDs.length);
   }
 
   return (
@@ -281,7 +282,18 @@ export default function Game() {
   const [userData, setUserData] = useState<User | false>();
   const { gameID } = useParams();
   const [connectionSuccess, setConnectionSuccess] = useState<boolean>();
+  const [lastGameState, setLastGameState] = useState<OngoingGameData>();
   const didUnmount = useRef(false);
+  const [colors, setColors] = useState<string[]>([]);
+
+  useEffect(() => {
+    setColors(
+      getListOfColors(
+        gameState?.connectedIDs.length || MINIMUM_NUMBER_OF_PLAYERS
+      )
+    );
+  }, []);
+
   const { sendMessage, lastMessage, readyState } = useWebSocket(
     gameID ? gameWebSocketURL(gameID) : null,
     { shouldReconnect: () => didUnmount.current === false, reconnectAttempts: 1 }
@@ -309,6 +321,13 @@ export default function Game() {
     console.log(lastMessage.data);
     const message: ServerMessage = JSON.parse(lastMessage.data);
     if (message.type === "state") {
+      if (
+        message.gameState.phase === "over" &&
+        gameState &&
+        gameState.phase === "ongoing"
+      ) {
+        setLastGameState(gameState);
+      }
       setGameState(message.gameState);
     } else if (message.type === "move") {
       setGameState(message.gameState);
@@ -424,13 +443,22 @@ export default function Game() {
           gameState={gameState}
           onMove={(column) => send({ type: "move", column })}
           username={userData.username}
+          colors={colors}
         />
       )}
       {gameState.phase === "over" && (
-        <div>
+        <div className="c4-jover">
           <h1>It's Jover</h1>
           {gameState.result.winnerID ? (
-            <h2>{gameState.result.winnerID} won!</h2>
+            <>
+              {gameState.result.winnerID === userData.username && (
+                <Confetti
+                  width={window.innerWidth * 0.9}
+                  height={window.innerHeight * 0.9}
+                />
+              )}
+              <h2>{gameState.result.winnerID} won!</h2>
+            </>
           ) : (
             <h2>No one won. Tie.</h2>
           )}
@@ -441,6 +469,16 @@ export default function Game() {
           >
             Rematch?
           </Button>
+          {lastGameState && (
+            <div className="c4-jover-state">
+              <Connect4Renderer
+                board={lastGameState.board}
+                lastMove={lastGameState.board.lastMove}
+                colors={colors}
+                onClickSlot={() => {}}
+              />
+            </div>
+          )}
         </div>
       )}
     </div>

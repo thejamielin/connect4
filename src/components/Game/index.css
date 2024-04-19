@@ -9,3 +9,15 @@
   flex-direction: column;
   align-items: center;
 }
+
+.c4-jover {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.c4-jover-state {
+  width: 50vw;
+}
