@@ -4,7 +4,13 @@ import { apiGetCurrentSessionUser, gameWebSocketURL } from "../../dao";
 import { Connect4Board } from "./connect4";
 import useWebSocket, { ReadyState } from "react-use-websocket";
 import { useNavigate, useParams } from "react-router";
-import { ClientRequest, GameData, GameCreationData, OngoingGameData, ServerMessage } from "./gameTypes";
+import {
+  ClientRequest,
+  GameData,
+  GameCreationData,
+  OngoingGameData,
+  ServerMessage,
+} from "./gameTypes";
 import { Button } from "react-bootstrap";
 import { User } from "../../types";
 import "./index.css";
@@ -209,7 +215,17 @@ interface GameplayPanelProps {
   username: string;
 }
 
-function GameplayPanel({ playerIndex, gameState, onMove, username }: GameplayPanelProps) {
+function GameplayPanel({
+  playerIndex,
+  gameState,
+  onMove,
+  username,
+}: GameplayPanelProps) {
+  const [colors, setColors] = useState<string[]>([]);
+
+  useEffect(() => {
+    setColors(getListOfColors());
+  }, []);
   function onClickSlot(col: number, row: number) {
     if (
       playerIndex === gameState.board.playerTurn &&
@@ -217,6 +233,24 @@ function GameplayPanel({ playerIndex, gameState, onMove, username }: GameplayPan
     ) {
       onMove(col);
     }
+  }
+  function getListOfColors() {
+    const colors = [
+      "var(--c4-red)",
+      "var(--c4-yellow)",
+      "var(--c4-green)",
+      "var(--c4-purple)",
+    ];
+    if (gameState.playerIDs.length > colors.length) {
+      const newColorCount = gameState.playerIDs.length - colors.length;
+      for (let i = 0; i < newColorCount; i++) {
+        var randomColor = "#000000".replace(/0/g, function () {
+          return (~~(Math.random() * 16)).toString(16);
+        });
+        colors.push(randomColor);
+      }
+    }
+    return colors.slice(0, gameState.playerIDs.length);
   }
 
   return (
@@ -227,17 +261,15 @@ function GameplayPanel({ playerIndex, gameState, onMove, username }: GameplayPan
           <Connect4Renderer
             board={gameState.board}
             lastMove={gameState.board.lastMove}
-            colors={["var(--c4-red)", "var(--c4-yellow)"]}
+            colors={colors}
             onClickSlot={onClickSlot}
           />
         </div>
-        <div style={{fontSize: "30px"}}>
-          It's {
-            username === gameState.playerIDs[gameState.board.playerTurn] ?
-            "your"
-            :
-            gameState.playerIDs[gameState.board.playerTurn] + "'s"
-          }
+        <div style={{ fontSize: "30px" }}>
+          It's{" "}
+          {username === gameState.playerIDs[gameState.board.playerTurn]
+            ? "your"
+            : gameState.playerIDs[gameState.board.playerTurn] + "'s"}
           {" turn"}
         </div>
       </div>
@@ -256,7 +288,7 @@ export default function Game() {
   );
   const [gameState, setGameState] = useState<GameData>();
 
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   useEffect(() => {
     return () => {
@@ -327,31 +359,40 @@ export default function Game() {
     return () => clearTimeout(timeout);
   }, [readyState]);
 
-  if (!userData || (userData.role === "beginner" && !(gameState && gameState.connectedIDs.includes("bot")))) {
+  if (
+    !userData ||
+    (userData.role === "beginner" &&
+      !(gameState && gameState.connectedIDs.includes("bot")))
+  ) {
     return (
       <div>
-        {userData === undefined ?
-          <TempMessage text="Loading..."/>
-          :
+        {userData === undefined ? (
+          <TempMessage text="Loading..." />
+        ) : (
           <div>
-            <Nav loggedIn={!!userData} isBeginner={true}/>
-            <TempMessage text="Must be logged in or non-beginner to play!"/>
-            <Button style={{margin: "10px", fontSize: "30px"}} onClick={() => navigate("/home")}>Go Home</Button>
+            <Nav loggedIn={!!userData} isBeginner={true} />
+            <TempMessage text="Must be logged in or non-beginner to play!" />
+            <Button
+              style={{ margin: "10px", fontSize: "30px" }}
+              onClick={() => navigate("/home")}
+            >
+              Go Home
+            </Button>
           </div>
-        }
+        )}
       </div>
     );
   }
 
   if (connectionSuccess === undefined || gameState === undefined) {
-    return <TempMessage text="Loading..."/>;
+    return <TempMessage text="Loading..." />;
   }
 
   if (connectionSuccess === false) {
     return (
       <div>
-        <Nav loggedIn={!!userData} isBeginner={true}/>
-        <TempMessage text="Connection failed! Does this game exist?"/>
+        <Nav loggedIn={!!userData} isBeginner={true} />
+        <TempMessage text="Connection failed! Does this game exist?" />
       </div>
     );
   }
@@ -393,7 +434,13 @@ export default function Game() {
           ) : (
             <h2>No one won. Tie.</h2>
           )}
-          <Button onClick={() => {navigate("/game/" + gameState.rematchId)}}>Rematch?</Button>
+          <Button
+            onClick={() => {
+              navigate("/game/" + gameState.rematchId);
+            }}
+          >
+            Rematch?
+          </Button>
         </div>
       )}
     </div>
