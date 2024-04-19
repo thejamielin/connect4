@@ -4,10 +4,17 @@ import { apiGetCurrentSessionUser, gameWebSocketURL } from "../../dao";
 import { Connect4Board } from "./connect4";
 import useWebSocket, { ReadyState } from "react-use-websocket";
 import { useParams } from "react-router";
-import { ClientRequest, GameData, GameCreationData, OngoingGameData, ServerMessage } from "./gameTypes";
+import "../../style.css";
+import {
+  ClientRequest,
+  GameData,
+  GameCreationData,
+  OngoingGameData,
+  ServerMessage,
+} from "./gameTypes";
 import { Button } from "react-bootstrap";
 import { User } from "../../types";
-import "./index.css"
+import "./index.css";
 import { Link } from "react-router-dom";
 import TempMessage from "../Util/TempMessage";
 
@@ -18,10 +25,17 @@ interface Connect4RendererProps {
   lastMove?: Connect4Board.ExecutedMove;
 }
 
-function Connect4Slot({pieceColor}: {pieceColor?: string}) {
+function Connect4Slot({ pieceColor }: { pieceColor?: string }) {
   return (
-    <svg width="100%" height="100%" viewBox="0 0 100 100" preserveAspectRatio="none" style={{objectFit: 'fill'}}>
-      <path d="M 0,0 
+    <svg
+      width="100%"
+      height="100%"
+      viewBox="0 0 100 100"
+      preserveAspectRatio="none"
+      style={{ objectFit: "fill" }}
+    >
+      <path
+        d="M 0,0 
               L 100,0 
               L 100,100 
               L 0,100 
@@ -29,18 +43,25 @@ function Connect4Slot({pieceColor}: {pieceColor?: string}) {
               M 50,50 
               m -45,0 
               a 45,45 0 1,0 90,0 
-              a 45,45 0 1,0 -90,0" fill="red"/>
-      {pieceColor && <circle cx={50} cy={50} r={45} fill={pieceColor}/>}
+              a 45,45 0 1,0 -90,0"
+        fill="var(--c4-blue)"
+      />
+      {pieceColor && <circle cx={50} cy={50} r={45} fill={pieceColor} />}
     </svg>
-  )
+  );
 }
 
-function Connect4Piece({pieceColor}: {pieceColor: string}) {
+function Connect4Piece({ pieceColor }: { pieceColor: string }) {
   return (
-    <svg width="100%" height="100%" viewBox="0 0 100 100" preserveAspectRatio="none">
-      <circle cx={50} cy={50} r={45} fill={pieceColor}/>
+    <svg
+      width="100%"
+      height="100%"
+      viewBox="0 0 100 100"
+      preserveAspectRatio="none"
+    >
+      <circle cx={50} cy={50} r={45} fill={pieceColor} />
     </svg>
-  )
+  );
 }
 
 interface PieceAnimation {
@@ -51,9 +72,17 @@ interface PieceAnimation {
   row: number;
 }
 
-function Connect4Renderer({board, colors, lastMove, onClickSlot}: Connect4RendererProps) {
+function Connect4Renderer({
+  board,
+  colors,
+  lastMove,
+  onClickSlot,
+}: Connect4RendererProps) {
   const [G, E, minVelocity] = [0.05, 0.3, 0.2];
-  const [slotWidthPercent, slotHeightPercent] = [100 / board.slots[0].length, 100 / board.slots.length];
+  const [slotWidthPercent, slotHeightPercent] = [
+    100 / board.slots[0].length,
+    100 / board.slots.length,
+  ];
   const [animation, setAnimation] = useState<PieceAnimation>();
 
   useEffect(() => {
@@ -61,8 +90,8 @@ function Connect4Renderer({board, colors, lastMove, onClickSlot}: Connect4Render
       if (!animation) {
         return;
       }
-      let height = animation.animatedHeight += animation.animatedVelocity;
-      let velocity = animation.animatedVelocity += G;
+      let height = (animation.animatedHeight += animation.animatedVelocity);
+      let velocity = (animation.animatedVelocity += G);
       if (height > animation.row) {
         if (Math.abs(velocity) < minVelocity) {
           setAnimation(undefined);
@@ -74,7 +103,7 @@ function Connect4Renderer({board, colors, lastMove, onClickSlot}: Connect4Render
       setAnimation({
         ...animation,
         animatedHeight: height,
-        animatedVelocity: velocity
+        animatedVelocity: velocity,
       });
     }, 20);
     return () => clearInterval(interval);
@@ -87,31 +116,51 @@ function Connect4Renderer({board, colors, lastMove, onClickSlot}: Connect4Render
     setAnimation({
       ...lastMove,
       animatedHeight: 0,
-      animatedVelocity: 0
-    })
+      animatedVelocity: 0,
+    });
   }, [lastMove]);
 
   return (
-    <div className="unselectable" style={{width: '100%', height: '100%', position: 'relative'}}>
+    <div
+      className="unselectable"
+      style={{ width: "100%", height: "100%", position: "relative" }}
+    >
       {animation && (
-        <div style={{
-          position: 'absolute',
-          left: slotWidthPercent * animation.column + '%',
-          top: slotHeightPercent * animation.animatedHeight + '%',
-          width: slotWidthPercent + '%',
-          height: slotHeightPercent + '%',
-          zIndex: -1
-          }}>
-          <Connect4Piece pieceColor={colors[animation.playerIndex]}/>
+        <div
+          style={{
+            position: "absolute",
+            left: slotWidthPercent * animation.column + "%",
+            top: slotHeightPercent * animation.animatedHeight + "%",
+            width: slotWidthPercent + "%",
+            height: slotHeightPercent + "%",
+            zIndex: -1,
+          }}
+        >
+          <Connect4Piece pieceColor={colors[animation.playerIndex]} />
         </div>
       )}
       {board.slots.map((row, i) => (
-        <div style={{height: slotHeightPercent + '%', width: '100%', display: 'flex'}} key={i}>
+        <div
+          style={{
+            height: slotHeightPercent + "%",
+            width: "100%",
+            display: "flex",
+          }}
+          key={i}
+        >
           {row.map((slot, j) => {
-            const pieceColor = (slot === false || (animation && i === animation.row && j === animation.column)) ? undefined : colors[slot];
+            const pieceColor =
+              slot === false ||
+              (animation && i === animation.row && j === animation.column)
+                ? undefined
+                : colors[slot];
             return (
-              <div style={{width: slotWidthPercent + '%', height: '100%'}} key={j} onMouseDown={() => onClickSlot(j, i)}>
-                <Connect4Slot key={j} pieceColor={pieceColor}/>
+              <div
+                style={{ width: slotWidthPercent + "%", height: "100%" }}
+                key={j}
+                onMouseDown={() => onClickSlot(j, i)}
+              >
+                <Connect4Slot key={j} pieceColor={pieceColor} />
               </div>
             );
           })}
@@ -121,29 +170,42 @@ function Connect4Renderer({board, colors, lastMove, onClickSlot}: Connect4Render
   );
 }
 
-function GameCreationPanel({ gameState, onReady }: { gameState: GameCreationData, onReady: () => void }) {
-  const url = window.location.href
-  const [copyText, setCopyText] = useState("Copy")
+function GameCreationPanel({
+  gameState,
+  onReady,
+}: {
+  gameState: GameCreationData;
+  onReady: () => void;
+}) {
+  const url = window.location.href;
+  const [copyText, setCopyText] = useState("Copy");
 
   return (
     <div className="page">
       <h1>Invite Friends with This Link:</h1>
-      <div style={{fontSize: "20px"}}>
+      <div style={{ fontSize: "20px" }}>
         <Link to={url}>{url}</Link>
-        <Button onClick={() => {navigator.clipboard.writeText(url); setCopyText("Copied!")}}
-                style={{marginLeft: "10px"}}>
-                  {copyText}
+        <Button
+          onClick={() => {
+            navigator.clipboard.writeText(url);
+            setCopyText("Copied!");
+          }}
+          style={{ marginLeft: "10px" }}
+        >
+          {copyText}
         </Button>
       </div>
-      Players in room: 
+      Players in room:
       {gameState.connectedIDs.map((name) => {
-        return(
-          <p>{name} - {gameState.readyIDs.includes(name) ? "Ready" : "Waiting"}</p>
-        )
+        return (
+          <p>
+            {name} - {gameState.readyIDs.includes(name) ? "Ready" : "Waiting"}
+          </p>
+        );
       })}
       <Button onClick={onReady}>Ready!</Button>
     </div>
-  )
+  );
 }
 
 interface GameplayPanelProps {
@@ -154,30 +216,31 @@ interface GameplayPanelProps {
 
 function GameplayPanel({ playerIndex, gameState, onMove }: GameplayPanelProps) {
   function onClickSlot(col: number, row: number) {
-    console.log('players', playerIndex, gameState.board.playerTurn)
+    console.log("players", playerIndex, gameState.board.playerTurn);
     console.log(Connect4Board.canMove(gameState.board, col));
-    if (playerIndex === gameState.board.playerTurn && Connect4Board.canMove(gameState.board, col)) {
+    if (
+      playerIndex === gameState.board.playerTurn &&
+      Connect4Board.canMove(gameState.board, col)
+    ) {
       onMove(col);
     }
   }
 
   return (
     <div>
-      <h2 style={{padding: "20px"}}>
-        Play Game!
-      </h2>
-      <div style={{display: 'flex', justifyContent: 'center'}}>
-        <div style={{height: '100%', width: '40%'}}>
+      <h2 style={{ padding: "20px" }}>Play Game!</h2>
+      <div style={{ display: "flex", justifyContent: "center" }}>
+        <div style={{ height: "100%", width: "40%" }}>
           <Connect4Renderer
             board={gameState.board}
             lastMove={gameState.board.lastMove}
-            colors={['red', 'yellow']}
+            colors={["var(--c4-red)", "var(--c4-yellow)"]}
             onClickSlot={onClickSlot}
           />
         </div>
       </div>
     </div>
-  )
+  );
 }
 
 export default function Game() {
@@ -186,11 +249,16 @@ export default function Game() {
   const { gameID } = useParams();
   const [connectionSuccess, setConnectionSuccess] = useState<boolean>();
   const didUnmount = useRef(false);
-  const { sendMessage, lastMessage, readyState } = useWebSocket(gameID ? gameWebSocketURL(gameID) : null, { shouldReconnect: () => didUnmount.current === false});
+  const { sendMessage, lastMessage, readyState } = useWebSocket(
+    gameID ? gameWebSocketURL(gameID) : null,
+    { shouldReconnect: () => didUnmount.current === false }
+  );
   const [gameState, setGameState] = useState<GameData>();
 
   useEffect(() => {
-    return () => { didUnmount.current = true };
+    return () => {
+      didUnmount.current = true;
+    };
   }, []);
 
   useEffect(() => {
@@ -204,11 +272,11 @@ export default function Game() {
     if (lastMessage === null) {
       return;
     }
-    console.log(lastMessage.data)
+    console.log(lastMessage.data);
     const message: ServerMessage = JSON.parse(lastMessage.data);
-    if (message.type === 'state') {
+    if (message.type === "state") {
       setGameState(message.gameState);
-    } else if (message.type === 'move') {
+    } else if (message.type === "move") {
       setGameState(message.gameState);
     }
 
@@ -216,19 +284,30 @@ export default function Game() {
       return;
     }
 
-    if (message.type === 'join') {
-      if (!gameState.connectedIDs.find(id => id === message.playerID)) {
-        setGameState({...gameState, connectedIDs: [...gameState.connectedIDs, message.playerID]});
+    if (message.type === "join") {
+      if (!gameState.connectedIDs.find((id) => id === message.playerID)) {
+        setGameState({
+          ...gameState,
+          connectedIDs: [...gameState.connectedIDs, message.playerID],
+        });
       }
       // TODO: indication
-    } else if (message.type === 'leave') {
-      setGameState({...gameState, connectedIDs: gameState.connectedIDs.filter(id => id !== message.playerID)});
-    } else if (message.type === 'ready') {
-      if (gameState.phase !== 'creation') {
-        console.error('A player has readied when the game already started?');
+    } else if (message.type === "leave") {
+      setGameState({
+        ...gameState,
+        connectedIDs: gameState.connectedIDs.filter(
+          (id) => id !== message.playerID
+        ),
+      });
+    } else if (message.type === "ready") {
+      if (gameState.phase !== "creation") {
+        console.error("A player has readied when the game already started?");
         return;
       }
-      setGameState({...gameState, readyIDs: [...gameState.readyIDs, message.playerID]});
+      setGameState({
+        ...gameState,
+        readyIDs: [...gameState.readyIDs, message.playerID],
+      });
     }
   }, [lastMessage]);
 
@@ -246,41 +325,55 @@ export default function Game() {
     return () => clearTimeout(timeout);
   }, [readyState]);
 
-  if (loggedIn === undefined || username === undefined || connectionSuccess === undefined || gameState === undefined) {
-    return <TempMessage text="Loading..."/>;
+  if (
+    loggedIn === undefined ||
+    username === undefined ||
+    connectionSuccess === undefined ||
+    gameState === undefined
+  ) {
+    return <TempMessage text="Loading..." />;
   }
 
   if (connectionSuccess === false) {
-    return (
-      <TempMessage text="Connection failed! Does this game exist?"/>
-    );
+    return <TempMessage text="Connection failed! Does this game exist?" />;
   }
 
   // TODO: perhaps send an api request to ask if the game exists
   // if (gameID === undefined)
 
   function send(message: ClientRequest) {
-    console.log('sending message')
+    console.log("sending message");
     sendMessage(JSON.stringify(message));
   }
 
   // TODO: Change isBeginner to check if actually a beginner here
   return (
     <div>
-      <Nav loggedIn={loggedIn} isBeginner={false}/>
+      <Nav loggedIn={loggedIn} isBeginner={false} />
       {readyState !== ReadyState.OPEN && <div>Connecting...</div>}
-      {gameState.phase === 'creation' && <GameCreationPanel gameState={gameState} onReady={() => send({ type: 'ready' })}/>}
-      {gameState.phase === 'ongoing' && (
-        <GameplayPanel
-          playerIndex={gameState.playerIDs.findIndex(playerID => playerID === username)}
+      {gameState.phase === "creation" && (
+        <GameCreationPanel
           gameState={gameState}
-          onMove={column => send({ type: 'move', column })}
+          onReady={() => send({ type: "ready" })}
         />
       )}
-      {gameState.phase === 'over' && (
+      {gameState.phase === "ongoing" && (
+        <GameplayPanel
+          playerIndex={gameState.playerIDs.findIndex(
+            (playerID) => playerID === username
+          )}
+          gameState={gameState}
+          onMove={(column) => send({ type: "move", column })}
+        />
+      )}
+      {gameState.phase === "over" && (
         <div>
           <h1>It's Jover</h1>
-          {gameState.result.winnerID ? <h2>{gameState.result.winnerID} won!</h2> : <h2>No one won. Tie.</h2>}
+          {gameState.result.winnerID ? (
+            <h2>{gameState.result.winnerID} won!</h2>
+          ) : (
+            <h2>No one won. Tie.</h2>
+          )}
         </div>
       )}
     </div>
