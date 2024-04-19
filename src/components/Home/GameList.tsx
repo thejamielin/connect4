@@ -41,16 +41,22 @@ export default GameList;
 
 function GameListEntry({ game }: { game: GameResult }) {
   function winIcon(playerName: string) {
-    return <span style={{width: '20pt', display: 'inline-block'}}>{game.winnerID === playerName && <i className="bi bi-trophy"></i>}</span>;
+    return <>{game.winnerID === playerName && <span style={{width: '20pt', display: 'inline-block'}}><i className="bi bi-trophy"></i></span>}</>
   }
   return (
     <div className="result-box">
       <div className="result-entry">
-        <div>
-          <a href={`/#/profile/${game.playerIDs[0]}`}> {winIcon(game.playerIDs[0])} {game.playerIDs[0]} </a>
-          <span style={{fontSize: 16}}>vs</span>
-          <a href={`/#/profile/${game.playerIDs[1]}`}> {game.playerIDs[1]}</a> {winIcon(game.playerIDs[1])}
-        </div>
+        {
+          game.playerIDs.map((player, index) => {
+            return (
+              <div>
+                <span>
+                  {index ? "vs" : ''} <a href={`/#/profile/${player}`}>{winIcon(player)}{player}</a>&nbsp;
+                </span>
+              </div>
+            )
+          })
+        }          
       </div>
     </div>
   );
