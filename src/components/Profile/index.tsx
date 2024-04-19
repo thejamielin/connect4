@@ -190,7 +190,7 @@ function Profile({
         isBeginner={currentUserData && currentUserData.role === "beginner"}
       />
       <Container className="profile">
-        <Row lg={2} md={1}>
+        <Row lg={2} sm={1}>
           <Col>
             <div style={{display: "flex"}}>
               {userData.role === "regular" && profilePic && (
