@@ -162,11 +162,12 @@ function Profile({
               setUserData({ ...userData, email: e.target.value })
             }
           />
-        </form>
-        <Button style={{marginLeft: "10px"}} 
+          <Button style={{marginLeft: "10px"}} 
                 onClick={handleEmailChange}>
                   Change Email
-        </Button>
+          </Button>
+        </form>
+        
       </div>
     );
   };
