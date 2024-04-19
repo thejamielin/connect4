@@ -34,11 +34,11 @@ function StartGamePanel({
       <Stack gap={2}>
         {!isBeginner ? (
           <>
-            <Button onClick={onPlayAgainstBot}>Bot Game?</Button>
+            <Button onClick={onPlayAgainstBot}>Play Against Bot</Button>
             <Button onClick={onPlayWithFriend}>Play with Friend</Button>
           </>
         ) : (
-          <Button>Start New Game</Button>
+          <Button onClick={onPlayAgainstBot}>Play Against Bot (For Beginner)</Button>
         )}
       </Stack>
     </div>
