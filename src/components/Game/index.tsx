@@ -211,8 +211,6 @@ interface GameplayPanelProps {
 
 function GameplayPanel({ playerIndex, gameState, onMove, username }: GameplayPanelProps) {
   function onClickSlot(col: number, row: number) {
-    console.log("players", playerIndex, gameState.board.playerTurn);
-    console.log(Connect4Board.canMove(gameState.board, col));
     if (
       playerIndex === gameState.board.playerTurn &&
       Connect4Board.canMove(gameState.board, col)
@@ -254,7 +252,7 @@ export default function Game() {
   const didUnmount = useRef(false);
   const { sendMessage, lastMessage, readyState } = useWebSocket(
     gameID ? gameWebSocketURL(gameID) : null,
-    { shouldReconnect: () => didUnmount.current === false }
+    { shouldReconnect: () => didUnmount.current === false, reconnectAttempts: 1 }
   );
   const [gameState, setGameState] = useState<GameData>();
 
