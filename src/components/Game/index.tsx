@@ -206,9 +206,10 @@ interface GameplayPanelProps {
   playerIndex: number;
   gameState: OngoingGameData;
   onMove: (col: number) => void;
+  username: string;
 }
 
-function GameplayPanel({ playerIndex, gameState, onMove }: GameplayPanelProps) {
+function GameplayPanel({ playerIndex, gameState, onMove, username }: GameplayPanelProps) {
   function onClickSlot(col: number, row: number) {
     console.log("players", playerIndex, gameState.board.playerTurn);
     console.log(Connect4Board.canMove(gameState.board, col));
@@ -223,7 +224,7 @@ function GameplayPanel({ playerIndex, gameState, onMove }: GameplayPanelProps) {
   return (
     <div>
       <h2 style={{ padding: "20px" }}>Play Game!</h2>
-      <div style={{ display: "flex", justifyContent: "center" }}>
+      <div className="board-container">
         <div style={{ height: "100%", width: "40%" }}>
           <Connect4Renderer
             board={gameState.board}
@@ -231,6 +232,15 @@ function GameplayPanel({ playerIndex, gameState, onMove }: GameplayPanelProps) {
             colors={["var(--c4-red)", "var(--c4-yellow)"]}
             onClickSlot={onClickSlot}
           />
+        </div>
+        <div style={{fontSize: "30px"}}>
+          It's {
+            username === gameState.playerIDs[gameState.board.playerTurn] ?
+            "your"
+            :
+            gameState.playerIDs[gameState.board.playerTurn] + "'s"
+          }
+          {" turn"}
         </div>
       </div>
     </div>
@@ -374,6 +384,7 @@ export default function Game() {
           )}
           gameState={gameState}
           onMove={(column) => send({ type: "move", column })}
+          username={userData.username}
         />
       )}
       {gameState.phase === "over" && (
