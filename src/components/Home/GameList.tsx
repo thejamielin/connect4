@@ -21,7 +21,7 @@ function GameList({userData} : {userData : RegularUser | false}) {
       searchParams.filter = { players: [userData.username] };
     }
     apiGamesSearch(searchParams).then(setGames);
-  }, []);
+  }, [userData]);
 
   return (
     <div className="game-box">
