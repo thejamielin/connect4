@@ -1,11 +1,10 @@
 import { useEffect, useState } from "react";
 import C4Nav from "../../Nav";
 import { useNavigate } from "react-router";
-import axios from "axios";
 import {
   apiAccountLogin,
   apiGetCurrentSessionUser,
-  cacheSessionToken
+  cacheSessionToken,
 } from "../../dao";
 import Inputs from "./Inputs";
 import { Button } from "react-bootstrap";
@@ -19,11 +18,10 @@ function Login() {
   const [userData, setUserData] = useState<User | false>();
   const [loginFail, setLoginFail] = useState<boolean>(false);
 
-
   useEffect(() => {
     apiGetCurrentSessionUser().then((data) => {
-      setUserData(data)
-    })
+      setUserData(data);
+    });
   }, []);
 
   useEffect(() => {
@@ -46,7 +44,7 @@ function Login() {
       name: "Password",
       set: setPassword,
       value: password,
-      type: "password"
+      type: "password",
     },
   ];
   function login() {
@@ -59,20 +57,24 @@ function Login() {
         navigate("/home");
       })
       .catch(() => {
-        setLoginFail(true)
+        setLoginFail(true);
       });
   }
 
   return (
     <div>
-      <C4Nav userData={userData}/>
+      <C4Nav userData={userData} />
       <div className="login-page">
         <h1>Login</h1>
         <Inputs fields={FIELDS} />
         {loginFail && <p className="error-text">Login Failed</p>}
         <div>
-          <Button size="lg" style={{marginRight: "10px"}} onClick={login}>Log in</Button>
-          <Button size="lg" onClick={() => navigate("/register")}>Go Register</Button>
+          <Button size="lg" style={{ marginRight: "10px" }} onClick={login}>
+            Log in
+          </Button>
+          <Button size="lg" onClick={() => navigate("/register")}>
+            Go Register
+          </Button>
         </div>
       </div>
     </div>
