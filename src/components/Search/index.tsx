@@ -12,7 +12,7 @@ import { useNavigate } from "react-router";
 import { useSearchParams } from "react-router-dom";
 import { BsHeartFill } from "react-icons/bs";
 import { User } from "../../types";
-import "./index.css"
+import "./index.css";
 import TempMessage from "../Util/TempMessage";
 
 function SearchEntry({
@@ -37,7 +37,7 @@ function SearchEntry({
 
   function onLike(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
     e.stopPropagation();
-    if(!userData) {
+    if (!userData) {
       return;
     }
     if (liked) {
@@ -57,10 +57,7 @@ function SearchEntry({
           onMouseEnter={() => setHoveringOver(false)}
           onMouseLeave={() => setHoveringOver(true)}
         >
-          <button
-            onClick={(e) => onLike(e)}
-            className="heart"
-          >
+          <button onClick={(e) => onLike(e)} className="heart">
             <BsHeartFill color={liked ? "red" : "gray"} size={24} />
           </button>
         </div>
@@ -78,13 +75,8 @@ function SearchEntry({
       onMouseLeave={() => setHoveringOver(false)}
       onClick={() => navigate(`/details/${pictureInfo.id}`)}
     >
-      <div className="text-style">
-        Image #{pictureInfo.id}
-      </div>
-      <img
-        src={pictureInfo.previewURL}
-        className="img"
-      />
+      <div className="text-style">Image #{pictureInfo.id}</div>
+      <img src={pictureInfo.previewURL} className="img" />
       <div className="text-style">
         {likeCount}
         <LikeButton />
@@ -111,7 +103,7 @@ function Search() {
   }, [searchParams]);
 
   if (userData === undefined) {
-    return <TempMessage text="Loading..."/>
+    return <TempMessage text="Loading..." />;
   }
 
   return (
