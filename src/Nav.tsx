@@ -55,7 +55,11 @@ function Nav({ userData }: { userData: User | false }) {
     <Navbar className="nav nav-tabs mt-2">
       <Link className="nav-link" to="/Home">
         <Navbar.Brand style={{ display: "flex", alignItems: "center" }}>
-          <img style={{ height: "30px" }} src="c4-icon.ico"></img> Connect4Fun
+          <img
+            style={{ height: "30px", marginRight: "8px" }}
+            src="c4-icon.ico"
+          ></img>
+          Connect4Fun
         </Navbar.Brand>
       </Link>
       <Navbar.Collapse>
