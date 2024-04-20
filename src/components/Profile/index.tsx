@@ -11,57 +11,66 @@ import { useNavigate, useParams } from "react-router";
 import { Button, Col, Container, Row } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import { User } from "../../types";
-import "./index.css"
+import "./index.css";
 import GameList from "../Home/GameList";
 import TempMessage from "../Util/TempMessage";
+import { Connect4State } from "../../store";
+import { useSelector, useDispatch } from "react-redux";
+import { setUserData as setCurrentUserData } from "../Account/reducer";
 
 export function SelfProfile() {
   const navigate = useNavigate();
-  const [userData, setUserData] = useState<User | false>();
+  const currentUserData = useSelector(
+    (state: Connect4State) => state.accountReducer.userData
+  );
+  const dispatch = useDispatch();
 
   useEffect(() => {
     apiGetCurrentSessionUser().then((data) => {
-      setUserData(data);
+      dispatch(setCurrentUserData(data));
     });
   }, []);
 
-  if (userData === undefined) {
-    return <TempMessage text="Loading..."/>
+  if (currentUserData === undefined) {
+    return <TempMessage text="Loading..." />;
   }
 
-  if (!userData) {
+  if (!currentUserData) {
     navigate("/login");
-    return <TempMessage text="Must be logged in. Redirecting..."/>
+    return <TempMessage text="Must be logged in. Redirecting..." />;
   }
 
-  return <Profile username={userData.username} isChill={true} />;
+  return <Profile username={currentUserData.username} isChill={true} />;
 }
 
 export function OtherProfile() {
   const navigate = useNavigate();
-  const [userData, setUserData] = useState<User | false>();
+  const currentUserData = useSelector(
+    (state: Connect4State) => state.accountReducer.userData
+  );
   const { username } = useParams();
+  const dispatch = useDispatch();
 
   useEffect(() => {
     apiGetCurrentSessionUser().then((data) => {
-      setUserData(data);
+      dispatch(setCurrentUserData(data));
     });
   }, []);
 
   useEffect(() => {
-    if (userData) {
+    if (currentUserData) {
       // are we the person we're looking at?
-      const isChill = userData.username === username;
+      const isChill = currentUserData.username === username;
       if (isChill) {
         navigate("/profile");
         return;
       }
-      userData.role === "beginner" && navigate("/home");
+      currentUserData.role === "beginner" && navigate("/home");
     }
-  }, [userData, username]);
+  }, [currentUserData, username]);
 
   if (!username) {
-    return <TempMessage text="Loading..."/>;
+    return <TempMessage text="Loading..." />;
   }
 
   return <Profile username={username} isChill={false} />;
@@ -74,19 +83,22 @@ function Profile({
   username: string;
   isChill: boolean;
 }) {
-  const [currentUserData, setCurrentUserData] = useState<User | false>();
+  const currentUserData = useSelector(
+    (state: Connect4State) => state.accountReducer.userData
+  );
   const [userData, setUserData] = useState<User | false>();
   const [amIFollowing, setAmIFollowing] = useState<boolean>(false);
   const [profilePic, setProfilePic] = useState<PictureInfo>();
+  const dispatch = useDispatch();
 
   const navigate = useNavigate();
 
   useEffect(() => {
     apiGetCurrentSessionUser().then((data) => {
-      setCurrentUserData(data);
-      data 
-      && data.role === "regular" 
-      && setAmIFollowing(data.following.includes(username));
+      dispatch(setCurrentUserData(data));
+      data &&
+        data.role === "regular" &&
+        setAmIFollowing(data.following.includes(username));
     });
   }, []);
 
@@ -106,13 +118,18 @@ function Profile({
   }, [username]);
 
   if (currentUserData === undefined || userData === undefined) {
-    return <TempMessage text="Loading..."/>;
+    return <TempMessage text="Loading..." />;
   }
   if (!userData) {
     return (
       <div>
-        <TempMessage text="User does not exist!"/>
-        <Button style={{marginLeft: "20px"}} onClick={() => navigate("/Home")}>Go Home</Button>
+        <TempMessage text="User does not exist!" />
+        <Button
+          style={{ marginLeft: "20px" }}
+          onClick={() => navigate("/Home")}
+        >
+          Go Home
+        </Button>
       </div>
     );
   }
@@ -146,28 +163,24 @@ function Profile({
 
   const chillUI = () => {
     return (
-      <div style={{display: "flex"}}>
+      <div style={{ display: "flex" }}>
         <form>
-          <label htmlFor="email-field">
-            Email:
-          </label>
+          <label htmlFor="email-field">Email:</label>
           <input
             type="text"
             id="email-field"
             title="Email field"
             placeholder="Email"
             value={userData.email}
-            style={{marginLeft: "10px", width: "250px"}}
+            style={{ marginLeft: "10px", width: "250px" }}
             onChange={(e) =>
               setUserData({ ...userData, email: e.target.value })
             }
           />
-          <Button style={{marginLeft: "10px"}} 
-                onClick={handleEmailChange}>
-                  Change Email
+          <Button style={{ marginLeft: "10px" }} onClick={handleEmailChange}>
+            Change Email
           </Button>
         </form>
-        
       </div>
     );
   };
@@ -186,11 +199,11 @@ function Profile({
 
   return (
     <div>
-      <Nav userData={currentUserData}/>
+      <Nav userData={currentUserData} />
       <Container className="profile">
         <Row lg={2} sm={1}>
           <Col>
-            <div style={{display: "flex"}}>
+            <div style={{ display: "flex" }}>
               {userData.role === "regular" && profilePic && (
                 <Link to={`/details/${userData.pfp}`}>
                   <img className="pfp" style={{}} src={profilePic.previewURL} />
@@ -199,26 +212,30 @@ function Profile({
               <h1>{username}'s Profile</h1>
             </div>
             {isChill ? chillUI() : notChillUI()}
-            {userData.role === "regular" &&
+            {userData.role === "regular" && (
               <div className="box">
                 <h2>Following</h2>
                 <ul>
-                  {userData.following.length !== 0 ?
-                  userData.following.map((follower: string) => (
-                    <Link to={`/profile/${follower}`}>
-                      <li key={follower}>{follower}</li>
-                    </Link>
-                  ))
-                  :
-                  <p>Not following anyone {":("}</p>}
+                  {userData.following.length !== 0 ? (
+                    userData.following.map((follower: string) => (
+                      <Link to={`/profile/${follower}`}>
+                        <li key={follower}>{follower}</li>
+                      </Link>
+                    ))
+                  ) : (
+                    <p>Not following anyone {":("}</p>
+                  )}
                 </ul>
               </div>
-            }
+            )}
           </Col>
           {userData.role === "regular" && (
             <Col>
-              <GameList userData={userData}/>
-              <div>Wins: {userData.stats.wins} Losses: {userData.stats.losses} Ties: {userData.stats.ties}</div>
+              <GameList userData={userData} />
+              <div>
+                Wins: {userData.stats.wins} Losses: {userData.stats.losses}{" "}
+                Ties: {userData.stats.ties}
+              </div>
             </Col>
           )}
         </Row>

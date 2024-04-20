@@ -18,6 +18,9 @@ import "./index.css";
 import "../../style.css";
 import { Link } from "react-router-dom";
 import TempMessage from "../Util/TempMessage";
+import { useSelector, useDispatch } from "react-redux";
+import { setUserData } from "../Account/reducer";
+import { Connect4State } from "../../store";
 
 const MINIMUM_NUMBER_OF_PLAYERS = 2;
 
@@ -279,12 +282,15 @@ function GameplayPanel({
 }
 
 export default function Game() {
-  const [userData, setUserData] = useState<User | false>();
+  const userData = useSelector(
+    (state: Connect4State) => state.accountReducer.userData
+  );
   const { gameID } = useParams();
   const [connectionSuccess, setConnectionSuccess] = useState<boolean>();
   const [lastGameState, setLastGameState] = useState<OngoingGameData>();
   const didUnmount = useRef(false);
   const [colors, setColors] = useState<string[]>([]);
+  const dispatch = useDispatch();
 
   useEffect(() => {
     setColors(
@@ -296,7 +302,10 @@ export default function Game() {
 
   const { sendMessage, lastMessage, readyState } = useWebSocket(
     gameID ? gameWebSocketURL(gameID) : null,
-    { shouldReconnect: () => didUnmount.current === false, reconnectAttempts: 1 }
+    {
+      shouldReconnect: () => didUnmount.current === false,
+      reconnectAttempts: 1,
+    }
   );
   const [gameState, setGameState] = useState<GameData>();
 
@@ -310,7 +319,7 @@ export default function Game() {
 
   useEffect(() => {
     apiGetCurrentSessionUser().then((data: User | false) => {
-      setUserData(data);
+      dispatch(setUserData(data));
     });
   }, []);
 
@@ -410,7 +419,7 @@ export default function Game() {
   if (connectionSuccess === false) {
     return (
       <div>
-        <Nav userData={userData}/>
+        <Nav userData={userData} />
         <TempMessage text="Connection failed! Does this game exist?" />
       </div>
     );
