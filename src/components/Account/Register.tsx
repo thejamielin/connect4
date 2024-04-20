@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
-import Nav from "../../Nav";
+import C4Nav from "../../Nav";
 import Inputs from "./Inputs";
 import {
   apiAccountRegister,
@@ -9,6 +9,7 @@ import {
 } from "../../dao";
 import { Button } from "react-bootstrap";
 import TempMessage from "../Util/TempMessage";
+import { User } from "../../types";
 
 export default function Register() {
   const navigate = useNavigate();
@@ -17,16 +18,16 @@ export default function Register() {
   const [email, setEmail] = useState<string>();
   const [isBeginner, setIsBeginner] = useState<boolean>(false);
   const [userExists, setUserExists] = useState<boolean>(false);
-  const [loggedIn, setLoggedIn] = useState<boolean>();
+  const [userData, setUserData] = useState<User | false>();
 
   useEffect(() => {
     apiGetCurrentSessionUser().then((data) => {
-      setLoggedIn(!!data);
+      setUserData(data);
     });
   }, []);
 
-  if (loggedIn === undefined) {
-    return <TempMessage text="Loading..." />;
+  if (userData === undefined) {
+    return <TempMessage text="Loading..."/>;
   }
 
   const FIELDS = [
@@ -72,7 +73,7 @@ export default function Register() {
 
   return (
     <div>
-      <Nav loggedIn={false} isBeginner={false}/>
+      <C4Nav userData={userData}/>
       <div className="login-page">
         <h1>Register</h1>
         <Inputs fields={FIELDS} />

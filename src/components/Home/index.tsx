@@ -1,4 +1,4 @@
-import Nav from "../../Nav";
+import C4Nav from "../../Nav";
 import { useNavigate } from "react-router-dom";
 import GameList from "./GameList";
 import { Button, Col, Container, Row, Stack } from "react-bootstrap";
@@ -69,7 +69,7 @@ function Home() {
 
   return (
     <div>
-      <Nav loggedIn={loggedIn} isBeginner={isBeginner} />
+      <C4Nav userData={userData} />
       <div>
         <Container style={{ marginLeft: "5%", marginRight: "5%" }}>
           <h1>Home</h1>

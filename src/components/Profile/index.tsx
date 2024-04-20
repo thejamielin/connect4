@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import Nav from "../../Nav";
+import C4Nav from "../../Nav";
 import {
   PictureInfo,
   apiGetCurrentSessionUser,
@@ -186,17 +186,14 @@ function Profile({
 
   return (
     <div>
-      <Nav
-        loggedIn={!!currentUserData}
-        isBeginner={currentUserData && currentUserData.role === "beginner"}
-      />
+      <C4Nav userData={currentUserData}/>
       <Container className="profile">
         <Row lg={2} sm={1}>
           <Col>
             <div style={{display: "flex"}}>
               {userData.role === "regular" && profilePic && (
                 <Link to={`/details/${userData.pfp}`}>
-                  <img className="pfp" src={profilePic.previewURL} />
+                  <img className="pfp" style={{}} src={profilePic.previewURL} />
                 </Link>
               )}
               <h1>{username}'s Profile</h1>

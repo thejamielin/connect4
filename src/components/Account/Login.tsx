@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import Nav from "../../Nav";
+import C4Nav from "../../Nav";
 import { useNavigate } from "react-router";
 import axios from "axios";
 import {
@@ -10,28 +10,29 @@ import {
 import Inputs from "./Inputs";
 import { Button } from "react-bootstrap";
 import TempMessage from "../Util/TempMessage";
+import { User } from "../../types";
 
 function Login() {
   const navigate = useNavigate();
   const [username, setUsername] = useState<string>("");
   const [password, setPassword] = useState<string>("");
-  const [loggedIn, setLoggedIn] = useState<boolean>();
+  const [userData, setUserData] = useState<User | false>();
   const [loginFail, setLoginFail] = useState<boolean>(false);
 
 
   useEffect(() => {
     apiGetCurrentSessionUser().then((data) => {
-      setLoggedIn(!!data)
+      setUserData(data)
     })
   }, []);
 
   useEffect(() => {
-    if (loggedIn === true) {
+    if (userData) {
       navigate("/home");
     }
-  }, [loggedIn]);
+  }, [userData]);
 
-  if (loggedIn === undefined) {
+  if (userData === undefined) {
     return <TempMessage text="Loading..." />;
   }
 
@@ -64,7 +65,7 @@ function Login() {
 
   return (
     <div>
-      <Nav loggedIn={loggedIn} isBeginner={false}/>
+      <C4Nav userData={userData}/>
       <div className="login-page">
         <h1>Login</h1>
         <Inputs fields={FIELDS} />

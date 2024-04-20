@@ -28,15 +28,18 @@ function SearchEntry({
   const [likeCount, setLikeCount] = useState<number>(0);
 
   useEffect(() => {
+    setLikeCount(pictureInfo.likes.length);
     if (!userData) {
       return;
     }
     setLiked(!!pictureInfo.likes.find((user) => user === userData.username));
-    setLikeCount(pictureInfo.likes.length);
   }, [userData]);
 
   function onLike(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
     e.stopPropagation();
+    if(!userData) {
+      return;
+    }
     if (liked) {
       apiPictureUnlike(pictureInfo.id + "");
       setLikeCount(likeCount - 1);
@@ -50,19 +53,17 @@ function SearchEntry({
   function LikeButton() {
     return (
       <div>
-        {userData && (
-          <div
-            onMouseEnter={() => setHoveringOver(false)}
-            onMouseLeave={() => setHoveringOver(true)}
+        <div
+          onMouseEnter={() => setHoveringOver(false)}
+          onMouseLeave={() => setHoveringOver(true)}
+        >
+          <button
+            onClick={(e) => onLike(e)}
+            className="heart"
           >
-            <button
-              onClick={(e) => onLike(e)}
-              className="heart"
-            >
-              <BsHeartFill color={liked ? "red" : "gray"} size={24} />
-            </button>
-          </div>
-        )}
+            <BsHeartFill color={liked ? "red" : "gray"} size={24} />
+          </button>
+        </div>
       </div>
     );
   }
@@ -95,14 +96,12 @@ function SearchEntry({
 function Search() {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
-  const [loggedIn, setLoggedIn] = useState<boolean>();
   const [userData, setUserData] = useState<User | false>();
   const [searchString, setSearchString] = useState<string>("");
   const [imageEntries, setImageEntries] = useState<PictureInfo[]>([]);
 
   useEffect(() => {
     apiGetCurrentSessionUser().then((data) => {
-      setLoggedIn(!!data);
       setUserData(data);
       data && data.role === "beginner" && navigate("/home");
     });
@@ -111,13 +110,13 @@ function Search() {
     );
   }, [searchParams]);
 
-  if (loggedIn === undefined || userData === undefined) {
+  if (userData === undefined) {
     return <TempMessage text="Loading..."/>
   }
 
   return (
     <div>
-      <Nav loggedIn={loggedIn} isBeginner={false} />
+      <Nav userData={userData} />
       <div className="search-page">
         <div style={{ position: "sticky", top: 0 }}>
           <h1>Search Profile Pictures</h1>

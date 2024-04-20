@@ -6,10 +6,14 @@ import {
   Navbar,
 } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
-import { apiAccountLogout } from "./dao";
+import { PictureInfo, apiAccountLogout, apiPictureId } from "./dao";
+import { User } from "./types";
+import { useEffect, useState } from "react";
+import "./index.css"
 
-function AccountButton({ loggedIn }: { loggedIn: boolean }) {
+function AccountButton({ loggedIn }: {loggedIn: boolean}) {
   const navigate = useNavigate();
+
   async function logout() {
     await apiAccountLogout().then(() => {
       navigate("/Home");
@@ -20,7 +24,7 @@ function AccountButton({ loggedIn }: { loggedIn: boolean }) {
   return (
     <div>
       {loggedIn ? (
-        <DropdownButton title="Account" align="end">
+        <DropdownButton title="Profile" align="end">
           <Dropdown.Item href="/#/profile">Profile</Dropdown.Item>
           <Dropdown.Item onClick={logout}>Logout</Dropdown.Item>
         </DropdownButton>
@@ -31,13 +35,25 @@ function AccountButton({ loggedIn }: { loggedIn: boolean }) {
   );
 }
 
-function Nav({
-  loggedIn,
-  isBeginner,
-}: {
-  loggedIn: boolean;
-  isBeginner: boolean;
+function Nav({userData}: {
+  userData : User | false
 }) {
+  const [pfp, setPfp] = useState<PictureInfo>();
+  const DEFAULT_PFP_ID = "973460"
+
+  useEffect(() => {
+    if(userData && userData.role === "regular" && userData.pfp) {
+      apiPictureId(userData.pfp).then((entry: PictureInfo) => {
+        setPfp(entry);
+      });
+    }
+    else {
+      apiPictureId(DEFAULT_PFP_ID).then((entry: PictureInfo) => {
+        setPfp(entry);
+      });
+    }
+  }, [userData])
+
   return (
     <Navbar className="nav nav-tabs mt-2">
       <Link className="nav-link" to="/Home">
@@ -47,15 +63,16 @@ function Nav({
       </Link>
       <Navbar.Collapse>
         <NavItem
-          className="d-flex justify-content-end"
+          className="d-flex justify-content-end align-items-center"
           style={{ width: "100%", paddingRight: "5%" }}
         >
-          {!isBeginner && (
+          {userData !== undefined && !(userData && userData.role === "beginner") && (
             <Link className="nav-link" to="/Search">
               Search Profile Pictures
             </Link>
           )}
-          <AccountButton loggedIn={loggedIn} />
+          <AccountButton loggedIn={!!userData} />
+          <img className="pfp" src={pfp && pfp.previewURL} />
         </NavItem>
       </Navbar.Collapse>
     </Navbar>

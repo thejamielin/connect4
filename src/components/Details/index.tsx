@@ -6,10 +6,11 @@ import { Button } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import "./index.css"
 import TempMessage from "../Util/TempMessage";
+import { User } from "../../types";
 
 function Details() {
   const { imageID } = useParams();
-  const [loggedIn, setLoggedIn] = useState<boolean>();
+  const [userData, setUserData] = useState<User | false>();
   const [entryData, setEntryData] = useState<PictureInfo | 'invalid'>();
   const [pfpSet, setPfpSet] = useState<boolean>(false);
 
@@ -17,15 +18,14 @@ function Details() {
 
   useEffect(() => {
     apiGetCurrentSessionUser().then((data) => {
-      setLoggedIn(!!data)
-      !!data && data.role === "beginner" && navigate("/home")
+      setUserData(data)
+      if (!!data && data.role === "beginner") {
+        navigate("/home")
+      }
     })
-  }, []);
+  }, [pfpSet]);
 
   useEffect(() => {
-    apiGetCurrentSessionUser().then((data) => {
-      setLoggedIn(!!data)
-    })
     if (!imageID) {
       setEntryData('invalid');
       return;
@@ -33,16 +33,16 @@ function Details() {
     apiPictureId(imageID).then(result => setEntryData(result)).catch(() => setEntryData('invalid'));
   }, []);
 
-  if (loggedIn === undefined || entryData === undefined) {
+  if (userData === undefined || entryData === undefined) {
     return <TempMessage text="Loading..."/>;
   }
 
   const setProfilePicture = () => {
-    entryData !== 'invalid' && apiSetUser({ pfp: entryData.id + '' }).then(setPfpSet);
+    entryData !== 'invalid' && apiSetUser({ pfp: entryData.id + '' }).then(() => setPfpSet(true));
   }
 
   function SetPfpButton() {
-    if (!loggedIn) {
+    if (!userData) {
       return <Button disabled={true}>Log in to Set as Profile Picture</Button>;
     }
     if (pfpSet) {
@@ -53,7 +53,7 @@ function Details() {
 
   return (
     <div style={{overflow: "hidden"}}>
-      <Nav loggedIn={loggedIn} isBeginner={false}/>
+      <Nav userData={userData}/>
       <div className="details-page">
         {entryData === 'invalid' ?
         <>
@@ -82,20 +82,23 @@ function Details() {
             <div style={{paddingTop: "10px"}}>
               <SetPfpButton/>
             </div>
-            <div>
-              Liked by: 
-              <ul>
-                {
-                  entryData.likes.map((name) => {
-                    return (
-                      <li>
-                        <a href={"/#/profile/"+name}>{name}</a>
-                      </li>
-                    )
-                  })
-                }
-              </ul>
-            </div>
+            {userData &&
+              <div>
+                Liked by: 
+                <ul>
+                  {entryData.likes.length === 0 ?
+                    "No one :("
+                    :
+                    entryData.likes.map((name) => {
+                      return (
+                        <li>
+                          <a href={"/#/profile/"+name}>{name}</a>
+                        </li>
+                      )
+                    })
+                  }
+                </ul>
+              </div>}
           </div>
         </div>
         }
