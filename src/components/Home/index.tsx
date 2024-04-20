@@ -4,8 +4,10 @@ import GameList from "./GameList";
 import { Button, Col, Container, Row, Stack } from "react-bootstrap";
 import { useEffect, useState } from "react";
 import { apiCreateGame, apiGetCurrentSessionUser } from "../../dao";
-import { User } from "../../types";
+import { setUserData } from "../Account/reducer";
 import TempMessage from "../Util/TempMessage";
+import { useSelector, useDispatch } from "react-redux";
+import { Connect4State } from "../../store";
 
 function StartGamePanel({
   isBeginner,
@@ -42,7 +44,9 @@ function StartGamePanel({
             <Button onClick={onPlayWithFriend}>Play with Friend</Button>
           </>
         ) : (
-          <Button onClick={onPlayAgainstBot}>Play Against Bot (For Beginner)</Button>
+          <Button onClick={onPlayAgainstBot}>
+            Play Against Bot (For Beginner)
+          </Button>
         )}
       </Stack>
     </div>
@@ -50,16 +54,18 @@ function StartGamePanel({
 }
 
 function Home() {
-  const [userData, setUserData] = useState<User | false>();
-
+  const dispatch = useDispatch();
+  const userData = useSelector(
+    (state: Connect4State) => state.accountReducer.userData
+  );
   useEffect(() => {
     apiGetCurrentSessionUser().then((data) => {
-      setUserData(data);
+      dispatch(setUserData(data));
     });
   }, []);
 
   if (userData === undefined) {
-    return <TempMessage text="Loading..."/>
+    return <TempMessage text="Loading..." />;
   }
 
   const [loggedIn, isBeginner] = [
