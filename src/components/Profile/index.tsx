@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import C4Nav from "../../Nav";
+import Nav from "../../Nav";
 import {
   PictureInfo,
   apiGetCurrentSessionUser,
@@ -186,7 +186,7 @@ function Profile({
 
   return (
     <div>
-      <C4Nav userData={currentUserData}/>
+      <Nav userData={currentUserData}/>
       <Container className="profile">
         <Row lg={2} sm={1}>
           <Col>

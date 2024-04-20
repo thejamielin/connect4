@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import C4Nav from "../../Nav";
+import Nav from "../../Nav";
 import { apiGetCurrentSessionUser, gameWebSocketURL } from "../../dao";
 import { Connect4Board } from "./connect4";
 import useWebSocket, { ReadyState } from "react-use-websocket";
@@ -389,7 +389,7 @@ export default function Game() {
           <TempMessage text="Loading..." />
         ) : (
           <div>
-            <C4Nav userData={userData} />
+            <Nav userData={userData} />
             <TempMessage text="Must be logged in or non-beginner to play!" />
             <Button
               style={{ margin: "10px", fontSize: "30px" }}
@@ -410,7 +410,7 @@ export default function Game() {
   if (connectionSuccess === false) {
     return (
       <div>
-        <C4Nav userData={userData}/>
+        <Nav userData={userData}/>
         <TempMessage text="Connection failed! Does this game exist?" />
       </div>
     );
@@ -427,7 +427,7 @@ export default function Game() {
   // TODO: Change isBeginner to check if actually a beginner here
   return (
     <div>
-      <C4Nav userData={userData} />
+      <Nav userData={userData} />
       {readyState !== ReadyState.OPEN && <div>Connecting...</div>}
       {gameState.phase === "creation" && (
         <GameCreationPanel
