@@ -9,9 +9,9 @@ import { Link, useNavigate } from "react-router-dom";
 import { PictureInfo, apiAccountLogout, apiPictureId } from "./dao";
 import { User } from "./types";
 import { useEffect, useState } from "react";
-import "./index.css"
+import "./index.css";
 
-function AccountButton({ loggedIn }: {loggedIn: boolean}) {
+function AccountButton({ loggedIn }: { loggedIn: boolean }) {
   const navigate = useNavigate();
 
   async function logout() {
@@ -35,29 +35,26 @@ function AccountButton({ loggedIn }: {loggedIn: boolean}) {
   );
 }
 
-function Nav({userData}: {
-  userData : User | false
-}) {
+function Nav({ userData }: { userData: User | false }) {
   const [pfp, setPfp] = useState<PictureInfo>();
-  const DEFAULT_PFP_ID = "973460"
+  const DEFAULT_PFP_ID = "973460";
 
   useEffect(() => {
-    if(userData && userData.role === "regular" && userData.pfp) {
+    if (userData && userData.role === "regular" && userData.pfp) {
       apiPictureId(userData.pfp).then((entry: PictureInfo) => {
         setPfp(entry);
       });
-    }
-    else {
+    } else {
       apiPictureId(DEFAULT_PFP_ID).then((entry: PictureInfo) => {
         setPfp(entry);
       });
     }
-  }, [userData])
+  }, [userData]);
 
   return (
     <Navbar className="nav nav-tabs mt-2">
       <Link className="nav-link" to="/Home">
-        <Navbar.Brand>
+        <Navbar.Brand style={{ display: "flex", alignItems: "center" }}>
           <img style={{ height: "30px" }} src="c4-icon.ico"></img> Connect4Fun
         </Navbar.Brand>
       </Link>
@@ -66,11 +63,12 @@ function Nav({userData}: {
           className="d-flex justify-content-end align-items-center"
           style={{ width: "100%", paddingRight: "5%" }}
         >
-          {userData !== undefined && !(userData && userData.role === "beginner") && (
-            <Link className="nav-link" to="/Search">
-              Search Profile Pictures
-            </Link>
-          )}
+          {userData !== undefined &&
+            !(userData && userData.role === "beginner") && (
+              <Link className="nav-link" to="/Search">
+                Search Profile Pictures
+              </Link>
+            )}
           <AccountButton loggedIn={!!userData} />
           <img className="pfp" src={pfp && pfp.previewURL} />
         </NavItem>
