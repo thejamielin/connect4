@@ -9,18 +9,23 @@ import {
 import Inputs from "./Inputs";
 import { Button } from "react-bootstrap";
 import TempMessage from "../Util/TempMessage";
-import { User } from "../../types";
+import { setUserData } from "../Account/reducer";
+import { useSelector, useDispatch } from "react-redux";
+import { Connect4State } from "../../store";
 
 function Login() {
   const navigate = useNavigate();
   const [username, setUsername] = useState<string>("");
   const [password, setPassword] = useState<string>("");
-  const [userData, setUserData] = useState<User | false>();
+  const userData = useSelector(
+    (state: Connect4State) => state.accountReducer.userData
+  );
   const [loginFail, setLoginFail] = useState<boolean>(false);
+  const dispatch = useDispatch();
 
   useEffect(() => {
     apiGetCurrentSessionUser().then((data) => {
-      setUserData(data);
+      dispatch(setUserData(data));
     });
   }, []);
 

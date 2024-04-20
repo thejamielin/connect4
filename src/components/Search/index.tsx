@@ -14,6 +14,9 @@ import { BsHeartFill } from "react-icons/bs";
 import { User } from "../../types";
 import "./index.css";
 import TempMessage from "../Util/TempMessage";
+import { useSelector, useDispatch } from "react-redux";
+import { setUserData } from "../Account/reducer";
+import { Connect4State } from "../../store";
 
 function SearchEntry({
   pictureInfo,
@@ -88,13 +91,16 @@ function SearchEntry({
 function Search() {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
-  const [userData, setUserData] = useState<User | false>();
+  const userData = useSelector(
+    (state: Connect4State) => state.accountReducer.userData
+  );
   const [searchString, setSearchString] = useState<string>("");
   const [imageEntries, setImageEntries] = useState<PictureInfo[]>([]);
+  const dispatch = useDispatch();
 
   useEffect(() => {
     apiGetCurrentSessionUser().then((data) => {
-      setUserData(data);
+      dispatch(setUserData(data));
       data && data.role === "beginner" && navigate("/home");
     });
     apiPictureSearch(searchParams.get("search") || "").then((result) =>
