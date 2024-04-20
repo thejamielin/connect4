@@ -82,6 +82,20 @@ function Details() {
             <div style={{paddingTop: "10px"}}>
               <SetPfpButton/>
             </div>
+            <div>
+              Liked by: 
+              <ul>
+                {
+                  entryData.likes.map((name) => {
+                    return (
+                      <li>
+                        <a href={"/#/profile/"+name}>{name}</a>
+                      </li>
+                    )
+                  })
+                }
+              </ul>
+            </div>
           </div>
         </div>
         }
