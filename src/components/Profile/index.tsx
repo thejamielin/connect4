@@ -83,9 +83,7 @@ function Profile({
   username: string;
   isChill: boolean;
 }) {
-  const currentUserData = useSelector(
-    (state: Connect4State) => state.accountReducer.userData
-  );
+  const [currentUserData, setCurrentUserData] = useState<User | false>();
   const [userData, setUserData] = useState<User | false>();
   const [amIFollowing, setAmIFollowing] = useState<boolean>(false);
   const [profilePic, setProfilePic] = useState<PictureInfo>();
@@ -95,7 +93,7 @@ function Profile({
 
   useEffect(() => {
     apiGetCurrentSessionUser().then((data) => {
-      dispatch(setCurrentUserData(data));
+      setCurrentUserData(data);
       data &&
         data.role === "regular" &&
         setAmIFollowing(data.following.includes(username));
@@ -108,12 +106,10 @@ function Profile({
         setUserData(userData);
         if (userData.pfp) {
           apiPictureId(userData.pfp).then((entry: PictureInfo) => {
-            console.log("setting pfp to", entry)
             setProfilePic(entry);
           });
-        }
-        else {
-          setProfilePic(undefined)
+        } else {
+          setProfilePic(undefined);
         }
       })
       .catch(() => {
