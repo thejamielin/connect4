@@ -103,6 +103,7 @@ function Search() {
       dispatch(setUserData(data));
       data && data.role === "beginner" && navigate("/home");
     });
+    setImageEntries([])
     apiPictureSearch(searchParams.get("search") || "").then((result) =>
       setImageEntries(result)
     );
@@ -129,9 +130,12 @@ function Search() {
               }
             }}
           />
-        </div>
+      </div>
         <div className="entry-container">
-          {imageEntries.slice(10).map((imageEntry, i) => (
+          {imageEntries.length === 0 ?
+          <p style={{fontSize: "40px"}}>Loading Images...</p>
+          :
+          imageEntries.slice(10).map((imageEntry, i) => (
             <SearchEntry pictureInfo={imageEntry} userData={userData} key={i} />
           ))}
         </div>
