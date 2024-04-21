@@ -83,7 +83,9 @@ function Profile({
   username: string;
   isChill: boolean;
 }) {
-  const [currentUserData, setCurrentUserData] = useState<User | false>();
+  const currentUserData = useSelector(
+    (state: Connect4State) => state.accountReducer.userData
+  );
   const [userData, setUserData] = useState<User | false>();
   const [amIFollowing, setAmIFollowing] = useState<boolean>(false);
   const [profilePic, setProfilePic] = useState<PictureInfo>();
@@ -93,7 +95,7 @@ function Profile({
 
   useEffect(() => {
     apiGetCurrentSessionUser().then((data) => {
-      setCurrentUserData(data);
+      dispatch(setCurrentUserData(data));
       data &&
         data.role === "regular" &&
         setAmIFollowing(data.following.includes(username));
@@ -144,15 +146,16 @@ function Profile({
 
   const handleFollow = async () => {
     if (currentUserData && currentUserData.role === "regular") {
-      const ownFollowing = currentUserData.following;
-      if (ownFollowing.includes(username)) {
-        currentUserData.following = ownFollowing.filter(
+      const newUserData = structuredClone(currentUserData);
+      if (newUserData.following.includes(username)) {
+        newUserData.following = newUserData.following.filter(
           (followee: string) => followee !== username
         );
       } else {
-        currentUserData.following.push(username);
+        newUserData.following.push(username);
       }
-      apiSetUser({ following: currentUserData.following }).then((success) => {
+      dispatch(setCurrentUserData(newUserData))
+      apiSetUser({ following: newUserData.following }).then((success) => {
         if (!success) {
           throw Error("Cannot update following list!");
         }
