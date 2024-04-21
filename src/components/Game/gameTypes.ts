@@ -62,13 +62,15 @@ export type ServerMessage = {
   gameState: OngoingGameData
 } |  {
   type: 'chat';
-  messages: {
-    playerID: string;
-    text: string;
-  }[];
+  messages: ChatMessage[];
 } | {
   type: 'leave';
   playerID: string;
+}
+
+export type ChatMessage = {
+  playerID: string;
+  text: string;
 }
 
 // TODO: implement games closing if no activity for some time w/ creation timestamp

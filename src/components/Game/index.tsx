@@ -11,8 +11,9 @@ import {
   GameCreationData,
   OngoingGameData,
   ServerMessage,
+  ChatMessage,
 } from "./gameTypes";
-import { Button } from "react-bootstrap";
+import { Button, Col, Container, Form, Row } from "react-bootstrap";
 import { User } from "../../types";
 import "./index.css";
 import "../../style.css";
@@ -261,7 +262,7 @@ function GameplayPanel({
     <div>
       <h2 style={{ padding: "20px" }}>Play Game!</h2>
       <div className="board-container">
-        <div style={{ height: "100%", width: "40%" }}>
+        <div className="render-container">
           <Connect4Renderer
             board={gameState.board}
             lastMove={gameState.board.lastMove}
@@ -281,6 +282,40 @@ function GameplayPanel({
   );
 }
 
+function ChatBox({history, sender} : {history : ChatMessage[], sender : (msg : string) => void}) {
+  const [message, setMessage] = useState<string>("")
+  const scrollableRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (scrollableRef.current) {
+      scrollableRef.current.scrollTop = scrollableRef.current.scrollHeight;
+    }
+  }, [history])
+
+  return (
+    <div className="chat-container">      
+      <div className="chat-box" ref={scrollableRef}>
+        {history.map((msg) => {
+          return <p>{msg.playerID}: {msg.text}</p>
+        })}
+      </div>
+      <div className="text-in">
+        <Form.Control
+              value={message}
+              placeholder="Send Message"
+              onChange={(e) => setMessage(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  message !== "" && sender(message)
+                  setMessage("")
+                }
+              }}
+        />
+      </div>
+    </div>
+  )
+}
+
 export default function Game() {
   const userData = useSelector(
     (state: Connect4State) => state.accountReducer.userData
@@ -290,6 +325,7 @@ export default function Game() {
   const [lastGameState, setLastGameState] = useState<OngoingGameData>();
   const didUnmount = useRef(false);
   const [colors, setColors] = useState<string[]>([]);
+  const [chat, setChat] = useState<ChatMessage[]>([]);
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -340,6 +376,9 @@ export default function Game() {
       setGameState(message.gameState);
     } else if (message.type === "move") {
       setGameState(message.gameState);
+    }
+    else if (message.type === "chat") {
+      setChat([...chat, ...message.messages])
     }
 
     if (gameState === undefined) {
@@ -418,7 +457,6 @@ export default function Game() {
   if (connectionSuccess === false) {
     return (
       <div>
-        <Nav userData={userData} />
         <TempMessage text="Connection failed! Does this game exist?" />
       </div>
     );
@@ -444,15 +482,24 @@ export default function Game() {
         />
       )}
       {gameState.phase === "ongoing" && (
-        <GameplayPanel
-          playerIndex={gameState.playerIDs.findIndex(
-            (playerID) => playerID === userData.username
-          )}
-          gameState={gameState}
-          onMove={(column) => send({ type: "move", column })}
-          username={userData.username}
-          colors={colors}
-        />
+        <Container fluid>
+          <Row>
+            <Col lg={9}>
+              <GameplayPanel
+                playerIndex={gameState.playerIDs.findIndex(
+                  (playerID) => playerID === userData.username
+                )}
+                gameState={gameState}
+                onMove={(column) => send({ type: "move", column })}
+                username={userData.username}
+                colors={colors}
+              />
+            </Col>
+            <Col lg={3}>
+              <ChatBox history={chat} sender={(msg) => send({type: "chat", message: msg})}/>
+            </Col>
+          </Row>
+        </Container>
       )}
       {gameState.phase === "over" && (
         <div className="c4-jover">
