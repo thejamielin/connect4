@@ -398,7 +398,6 @@ export default function Game() {
           <TempMessage text="Loading..." />
         ) : (
           <div>
-            <Nav userData={userData} />
             <TempMessage text="Must be logged in or non-beginner to play!" />
             <Button
               style={{ margin: "10px", fontSize: "30px" }}
