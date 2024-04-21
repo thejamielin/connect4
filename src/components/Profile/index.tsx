@@ -108,8 +108,12 @@ function Profile({
         setUserData(userData);
         if (userData.pfp) {
           apiPictureId(userData.pfp).then((entry: PictureInfo) => {
+            console.log("setting pfp to", entry)
             setProfilePic(entry);
           });
+        }
+        else {
+          setProfilePic(undefined)
         }
       })
       .catch(() => {
@@ -206,7 +210,7 @@ function Profile({
             <div style={{ display: "flex" }}>
               {userData.role === "regular" && profilePic && (
                 <Link to={`/details/${userData.pfp}`}>
-                  <img className="pfp" style={{}} src={profilePic.previewURL} />
+                  <img className="pfp" src={profilePic.previewURL} />
                 </Link>
               )}
               <h1>{username}'s Profile</h1>

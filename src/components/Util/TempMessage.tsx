@@ -1,4 +1,4 @@
-import C4Nav from "../../Nav";
+import Nav from "../../Nav";
 import { useSelector } from "react-redux";
 import { Connect4State } from "../../store";
 
@@ -8,7 +8,7 @@ export default function TempMessage({ text }: { text: string }) {
   );
   return (
     <div>
-      <C4Nav userData={userData} />
+      <Nav userData={userData} />
       <div style={{ fontSize: "40px", padding: "20px" }}>{text}</div>
     </div>
   );

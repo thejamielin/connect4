@@ -49,9 +49,17 @@ function Details() {
     return <TempMessage text="Loading..." />;
   }
 
+  if (entryData === "invalid") {
+    return (
+      <>
+        <TempMessage text="This image does not exist" />
+        <Button style={{margin: "20px"}} onClick={() => navigate("/search")}>{"< Search"}</Button>
+      </>
+    )
+  }
+
   const setProfilePicture = () => {
-    entryData !== "invalid" &&
-      apiSetUser({ pfp: entryData.id + "" }).then(() => setPfpSet(true));
+    apiSetUser({ pfp: entryData.id + "" }).then(() => setPfpSet(true));
   };
 
   function SetPfpButton() {
@@ -68,51 +76,44 @@ function Details() {
     <div style={{ overflow: "hidden" }}>
       <Nav userData={userData} />
       <div className="details-page">
-        {entryData === "invalid" ? (
-          <>
+        <div style={{ display: "flex" }}>
+          <div className="img-container">
             <Button onClick={() => navigate("/search")}>{"< Search"}</Button>
-            <TempMessage text="This image does not exist" />
-          </>
-        ) : (
-          <div style={{ display: "flex" }}>
-            <div className="img-container">
-              <Button onClick={() => navigate("/search")}>{"< Search"}</Button>
-              <div>
-                <img className="img" src={entryData.webformatURL} />
-              </div>
-            </div>
             <div>
-              <h1>Details</h1>
-              <div>
-                <h2>Image #{entryData.id}</h2>
-                <h4>
-                  Artist: {entryData.user} &nbsp; Views: {entryData.views}{" "}
-                  &nbsp; Tags: {entryData.tags}
-                </h4>
-              </div>
-              <Link to={entryData.pageURL}>{entryData.pageURL}</Link>
-              <div style={{ paddingTop: "10px" }}>
-                <SetPfpButton />
-              </div>
-              {userData && (
-                <div>
-                  Liked by:
-                  <ul>
-                    {entryData.likes.length === 0
-                      ? "No one :("
-                      : entryData.likes.map((name) => {
-                          return (
-                            <li>
-                              <a href={"/#/profile/" + name}>{name}</a>
-                            </li>
-                          );
-                        })}
-                  </ul>
-                </div>
-              )}
+              <img className="img" src={entryData.webformatURL} />
             </div>
           </div>
-        )}
+          <div>
+            <h1>Details</h1>
+            <div>
+              <h2>Image #{entryData.id}</h2>
+              <h4>
+                Artist: {entryData.user} &nbsp; Views: {entryData.views}{" "}
+                &nbsp; Tags: {entryData.tags}
+              </h4>
+            </div>
+            <Link to={entryData.pageURL}>{entryData.pageURL}</Link>
+            <div style={{ paddingTop: "10px" }}>
+              <SetPfpButton />
+            </div>
+            {userData && (
+              <div>
+                Liked by:
+                <ul>
+                  {entryData.likes.length === 0
+                    ? "No one :("
+                    : entryData.likes.map((name) => {
+                        return (
+                          <li>
+                            <a href={"/#/profile/" + name}>{name}</a>
+                          </li>
+                        );
+                      })}
+                </ul>
+              </div>
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );
