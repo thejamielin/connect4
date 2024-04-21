@@ -19,7 +19,8 @@
 }
 
 .c4-jover-state {
-  width: 50vw;
+  height: 100%;
+  width: 50%;
 }
 
 @media (min-width: 0px) {
@@ -56,5 +57,5 @@
 
 .render-container {
   height: 100%;
-  width: 40vw;
+  width: 50%;
 }
