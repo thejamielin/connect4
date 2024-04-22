@@ -8,7 +8,7 @@ import {
 } from "../../dao";
 import { useNavigate, useParams } from "react-router";
 import { Button } from "react-bootstrap";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import "./index.css";
 import TempMessage from "../Util/TempMessage";
 import { useSelector, useDispatch } from "react-redux";
@@ -17,6 +17,7 @@ import { Connect4State } from "../../store";
 
 function Details() {
   const { imageID } = useParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const userData = useSelector(
     (state: Connect4State) => state.accountReducer.userData
   );
@@ -53,7 +54,9 @@ function Details() {
     return (
       <>
         <TempMessage text="This image does not exist" />
-        <Button style={{margin: "20px"}} onClick={() => navigate("/search")}>{"< Search"}</Button>
+        <Button style={{margin: "20px"}} onClick={() => navigate("/search" + (searchParams.get("query") ? "?search=" + searchParams.get("query") : ""))}>
+          {"< Search"}
+        </Button>
       </>
     )
   }
@@ -78,7 +81,9 @@ function Details() {
       <div className="details-page">
         <div style={{ display: "flex" }}>
           <div className="img-container">
-            <Button onClick={() => navigate("/search")}>{"< Search"}</Button>
+            <Button onClick={() => navigate("/search" + (searchParams.get("query") ? "?search=" + searchParams.get("query") : ""))}>
+              {"< Search"}
+            </Button>
             <div>
               <img className="img" src={entryData.webformatURL} />
             </div>

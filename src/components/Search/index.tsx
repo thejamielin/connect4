@@ -21,9 +21,11 @@ import { Connect4State } from "../../store";
 function SearchEntry({
   pictureInfo,
   userData,
+  query,
 }: {
   pictureInfo: PictureInfo;
   userData: User | false;
+  query: string | false;
 }) {
   const navigate = useNavigate();
   const [hoveringOver, setHoveringOver] = useState<boolean>();
@@ -76,7 +78,7 @@ function SearchEntry({
       }}
       onMouseEnter={() => setHoveringOver(true)}
       onMouseLeave={() => setHoveringOver(false)}
-      onClick={() => navigate(`/details/${pictureInfo.id}`)}
+      onClick={() => navigate(`/details/${pictureInfo.id}` + (query ? `?query=${query}` : ""))}
     >
       <div className="text-style">Image #{pictureInfo.id}</div>
       <img src={pictureInfo.previewURL} className="img" />
@@ -104,9 +106,10 @@ function Search() {
       data && data.role === "beginner" && navigate("/home");
     });
     setImageEntries([])
-    apiPictureSearch(searchParams.get("search") || "").then((result) =>
+    setSearchString(searchParams.get("search") || "")
+    apiPictureSearch(searchParams.get("search") || "").then((result) => {
       setImageEntries(result)
-    );
+  });
   }, [searchParams]);
 
   if (userData === undefined) {
@@ -136,7 +139,11 @@ function Search() {
           <p style={{fontSize: "40px"}}>Loading Images...</p>
           :
           imageEntries.slice(10).map((imageEntry, i) => (
-            <SearchEntry pictureInfo={imageEntry} userData={userData} key={i} />
+            <SearchEntry pictureInfo={imageEntry}
+                         userData={userData}
+                         key={i}
+                         query={searchString}
+            />
           ))}
         </div>
       </div>
