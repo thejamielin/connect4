@@ -324,27 +324,11 @@ export default function Game() {
   const [connectionSuccess, setConnectionSuccess] = useState<boolean>();
   const [lastGameState, setLastGameState] = useState<OngoingGameData>();
   const didUnmount = useRef(false);
-  const [colors, setColors] = useState<string[]>([]);
+  const [colors, setColors] = useState<string[]>();
   const [chat, setChat] = useState<ChatMessage[]>([]);
-  const dispatch = useDispatch();
-
-  useEffect(() => {
-    setColors(
-      getListOfColors(
-        gameState?.connectedIDs.length || MINIMUM_NUMBER_OF_PLAYERS
-      )
-    );
-  }, []);
-
-  const { sendMessage, lastMessage, readyState } = useWebSocket(
-    gameID ? gameWebSocketURL(gameID) : null,
-    {
-      shouldReconnect: () => didUnmount.current === false,
-      reconnectAttempts: 1,
-    }
-  );
   const [gameState, setGameState] = useState<GameData>();
 
+  const dispatch = useDispatch();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -354,16 +338,33 @@ export default function Game() {
   }, []);
 
   useEffect(() => {
+    gameState?.phase === "ongoing"
+    && !colors
+    && setColors(
+      getListOfColors(
+        gameState?.connectedIDs.length || MINIMUM_NUMBER_OF_PLAYERS
+      )
+    );
+  }, [gameState]);
+
+  useEffect(() => {
     apiGetCurrentSessionUser().then((data: User | false) => {
       dispatch(setUserData(data));
     });
   }, []);
 
+  const { sendMessage, lastMessage, readyState } = useWebSocket(
+    gameID ? gameWebSocketURL(gameID) : null,
+    {
+      shouldReconnect: () => didUnmount.current === false,
+      reconnectAttempts: 1,
+    }
+  );
+
   useEffect(() => {
     if (lastMessage === null) {
       return;
     }
-    console.log(lastMessage.data);
     const message: ServerMessage = JSON.parse(lastMessage.data);
     if (message.type === "state") {
       if (
@@ -492,7 +493,7 @@ export default function Game() {
                 gameState={gameState}
                 onMove={(column) => send({ type: "move", column })}
                 username={userData.username}
-                colors={colors}
+                colors={colors ? colors : []}
               />
             </Col>
             <Col lg={3}>
@@ -529,7 +530,7 @@ export default function Game() {
               <Connect4Renderer
                 board={lastGameState.board}
                 lastMove={lastGameState.board.lastMove}
-                colors={colors}
+                colors={colors ? colors : []}
                 onClickSlot={() => {}}
               />
             </div>
