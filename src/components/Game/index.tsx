@@ -12,6 +12,7 @@ import {
   OngoingGameData,
   ServerMessage,
   ChatMessage,
+  EndedGameData,
 } from "./gameTypes";
 import { Button, Col, Container, Form, Row } from "react-bootstrap";
 import { User } from "../../types";
@@ -322,7 +323,7 @@ export default function Game() {
   );
   const { gameID } = useParams();
   const [connectionSuccess, setConnectionSuccess] = useState<boolean>();
-  const [lastGameState, setLastGameState] = useState<OngoingGameData>();
+  const [lastGameState, setLastGameState] = useState<GameData>();
   const didUnmount = useRef(false);
   const [colors, setColors] = useState<string[]>();
   const [chat, setChat] = useState<ChatMessage[]>([]);
@@ -368,11 +369,9 @@ export default function Game() {
     const message: ServerMessage = JSON.parse(lastMessage.data);
     if (message.type === "state") {
       if (
-        message.gameState.phase === "over" &&
-        gameState &&
-        gameState.phase === "ongoing"
+        message.gameState.phase === "over"
       ) {
-        setLastGameState(gameState);
+        setLastGameState(message.gameState);
       }
       setGameState(message.gameState);
     } else if (message.type === "move") {
@@ -525,11 +524,11 @@ export default function Game() {
           >
             Rematch?
           </Button>
-          {lastGameState && (
+          {lastGameState?.phase === "over" && (
             <div className="c4-jover-state">
               <Connect4Renderer
-                board={lastGameState.board}
-                lastMove={lastGameState.board.lastMove}
+                board={lastGameState.finalBoard}
+                lastMove={lastGameState.finalBoard.lastMove}
                 colors={colors ? colors : []}
                 onClickSlot={() => {}}
               />
